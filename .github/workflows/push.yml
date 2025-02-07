@@ -1,0 +1,28 @@
+name: Push
+
+on:
+  push:
+    tags:
+      - v**
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup
+        uses: mattermost/actions/plugin-ci/setup@cd879ea9c64cc3e26a75a042d1c5066be28130a6
+        with:
+          golang-version: "1.23.6"
+
+      - name: Build
+        uses: mattermost/actions/plugin-ci/build@cd879ea9c64cc3e26a75a042d1c5066be28130a6
+
+      - name: Upload plugin to release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*tar.gz
