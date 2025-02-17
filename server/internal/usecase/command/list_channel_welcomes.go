@@ -9,23 +9,25 @@ import (
 	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )
 
-func ListChannelWelcomes(
-	m usecase.CommandMessenger,
-	wr usecase.ChannelWelcomeRepo,
-	cr usecase.ChannelRepo,
-) {
-	personalIDs, publishedIDs, appErr := wr.ListChannelsWithWelcome()
+type ListChannelWelcomes struct {
+	CommandMessenger   usecase.CommandMessenger
+	ChannelWelcomeRepo usecase.ChannelWelcomeRepo
+	ChannelRepo        usecase.ChannelRepo
+}
+
+func (uc *ListChannelWelcomes) Call() {
+	personalIDs, publishedIDs, appErr := uc.ChannelWelcomeRepo.ListChannelsWithWelcome()
 
 	if appErr != nil {
 		response := fmt.Sprintf("error occurred while listing channels: `%s`", appErr)
-		m.PostCommandResponse(response)
+		uc.CommandMessenger.PostCommandResponse(response)
 		return
 	}
 
 	var builder strings.Builder
 
-	personalChannels := fetchChannels(personalIDs, cr)
-	publishedChannels := fetchChannels(publishedIDs, cr)
+	personalChannels := fetchChannels(personalIDs, uc.ChannelRepo)
+	publishedChannels := fetchChannels(publishedIDs, uc.ChannelRepo)
 
 	if len(publishedChannels) > 0 {
 		builder.WriteString("Channels with published welcome message:\n")
@@ -45,7 +47,7 @@ func ListChannelWelcomes(
 		}
 	}
 
-	m.PostCommandResponse(builder.String())
+	uc.CommandMessenger.PostCommandResponse(builder.String())
 }
 
 func fetchChannels(list []string, cr usecase.ChannelRepo) []*model.Channel {

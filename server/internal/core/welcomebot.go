@@ -5,45 +5,9 @@ import (
 	"fmt"
 	"html/template"
 	"strings"
-	"time"
 
 	"github.com/mattermost/mattermost/server/public/model"
 )
-
-func (p *Plugin) constructMessageTemplate(userID, teamID string) *MessageTemplate {
-	data := &MessageTemplate{}
-	var err *model.AppError
-
-	if len(userID) > 0 {
-		if data.User, err = p.API.GetUser(userID); err != nil {
-			p.API.LogError("failed to query user", "user_id", userID)
-			return nil
-		}
-	}
-
-	if len(teamID) > 0 {
-		if data.Team, err = p.API.GetTeam(teamID); err != nil {
-			p.API.LogError("failed to query team", "team_id", teamID)
-			return nil
-		}
-	}
-
-	if data.Townsquare, err = p.API.GetChannelByName(teamID, "town-square", false); err != nil {
-		p.API.LogError("failed to query town-square", "team_id", teamID)
-		return nil
-	}
-
-	if data.User != nil {
-		if data.DirectMessage, err = p.API.GetDirectChannel(userID, p.BotUserID); err != nil {
-			p.API.LogError("failed to query direct message channel", "user_id", userID)
-			return nil
-		}
-	}
-
-	data.UserDisplayName = data.User.GetDisplayName(model.ShowNicknameFullName)
-
-	return data
-}
 
 func (p *Plugin) getSiteURL() string {
 	siteURL := "http://localhost:8065"
@@ -175,26 +139,6 @@ func (p *Plugin) renderWelcomeMessage(messageTemplate MessageTemplate, configMes
 	}
 
 	return post
-}
-
-func (p *Plugin) processWelcomeMessage(messageTemplate MessageTemplate, configMessage ConfigMessage) {
-	time.Sleep(time.Second * time.Duration(configMessage.DelayInSeconds))
-
-	siteURL := p.getSiteURL()
-	if strings.Contains(siteURL, "localhost") || strings.Contains(siteURL, "127.0.0.1") {
-		p.API.LogWarn(`Site url is set to localhost or 127.0.0.1.  For this to work properly you must also set "AllowedUntrustedInternalConnections": "127.0.0.1" in config.json`)
-	}
-
-	post := p.renderWelcomeMessage(messageTemplate, configMessage)
-	post.ChannelId = messageTemplate.DirectMessage.Id
-
-	if _, err := p.API.CreatePost(post); err != nil {
-		p.API.LogError(
-			"We could not create the response post",
-			"user_id", post.UserId,
-			"err", err.Error(),
-		)
-	}
 }
 
 func (p *Plugin) processActionMessage(messageTemplate MessageTemplate, action *Action, configMessageAction ConfigMessageAction) {

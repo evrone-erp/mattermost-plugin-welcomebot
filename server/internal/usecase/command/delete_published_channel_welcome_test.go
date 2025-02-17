@@ -12,53 +12,69 @@ import (
 func TestDeletePublishedChanelWelcome(t *testing.T) {
 	channelID := "test-channel"
 
-	setupMocks := func() (*usecase.MockCommandMessenger, *usecase.MockChannelWelcomeRepo) {
-		m := new(usecase.MockCommandMessenger)
-		wr := new(usecase.MockChannelWelcomeRepo)
-		m.On("PostCommandResponse", mock.Anything).Return()
+	type Setup struct {
+		CommandMessenger   *usecase.MockCommandMessenger
+		ChannelWelcomeRepo *usecase.MockChannelWelcomeRepo
+		Subject            *DeletePublishedChanelWelcome
+	}
 
-		return m, wr
+	setup := func() *Setup {
+		commandMessenger := new(usecase.MockCommandMessenger)
+		channelWelcomeRepo := new(usecase.MockChannelWelcomeRepo)
+
+		commandMessenger.On("PostCommandResponse", mock.Anything).Return()
+
+		subject := &DeletePublishedChanelWelcome{
+			CommandMessenger:   commandMessenger,
+			ChannelWelcomeRepo: channelWelcomeRepo,
+		}
+
+		return &Setup{
+			CommandMessenger:   commandMessenger,
+			ChannelWelcomeRepo: channelWelcomeRepo,
+			Subject:            subject,
+		}
 	}
 
 	t.Run("happy path", func(t *testing.T) {
-		m, wr := setupMocks()
-		wr.On("GetPublishedChanelWelcome", channelID).Return(&model.ChannelWelcome{Message: "Hello, friend"}, nil)
-		wr.On("DeletePublishedChanelWelcome", channelID).Return(nil)
+		s := setup()
+		s.ChannelWelcomeRepo.On("GetPublishedChanelWelcome", channelID).Return(&model.ChannelWelcome{Message: "Hello, friend"}, nil)
+		s.ChannelWelcomeRepo.On("DeletePublishedChanelWelcome", channelID).Return(nil)
 
-		DeletePublishedChanelWelcome(m, wr, channelID)
+		s.Subject.Call(channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "welcome message has been deleted")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "welcome message has been deleted")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
 	})
 
 	t.Run("no message", func(t *testing.T) {
-		m, wr := setupMocks()
-		wr.On("GetPublishedChanelWelcome", channelID).Return(nil, nil)
+		s := setup()
+		s.ChannelWelcomeRepo.On("GetPublishedChanelWelcome", channelID).Return(nil, nil)
 
-		DeletePublishedChanelWelcome(m, wr, channelID)
+		s.Subject.Call(channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "welcome message has not been set yet")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "welcome message has not been set yet")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
 	})
 
 	t.Run("error while deleting from store", func(t *testing.T) {
-		m, wr := setupMocks()
-		wr.On("GetPublishedChanelWelcome", channelID).Return(&model.ChannelWelcome{Message: "useful"}, nil)
-		wr.On("DeletePublishedChanelWelcome", channelID).Return(&mmodel.AppError{Message: "DAMN"})
+		s := setup()
+		s.ChannelWelcomeRepo.On("GetPublishedChanelWelcome", channelID).Return(&model.ChannelWelcome{Message: "useful"}, nil)
+		s.ChannelWelcomeRepo.On("DeletePublishedChanelWelcome", channelID).Return(&mmodel.AppError{Message: "DAMN"})
 
-		DeletePublishedChanelWelcome(m, wr, channelID)
+		s.Subject.Call(channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "error occurred while deleting the welcome message for the chanel: `DAMN`")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "error occurred while deleting the welcome message for the chanel: `DAMN`")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
 	})
 
 	t.Run("error while retreiving from store", func(t *testing.T) {
-		m, wr := setupMocks()
-		wr.On("GetPublishedChanelWelcome", channelID).Return(nil, &mmodel.AppError{Message: "FOO"})
+		s := setup()
+		s.ChannelWelcomeRepo.On("GetPublishedChanelWelcome", channelID).Return(nil, &mmodel.AppError{Message: "FOO"})
 
-		DeletePublishedChanelWelcome(m, wr, channelID)
+		s.Subject.Call(channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "error occurred while retrieving the welcome message for the chanel: `FOO`")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "error occurred while retrieving the welcome message for the chanel: `FOO`")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
 	})
 }
