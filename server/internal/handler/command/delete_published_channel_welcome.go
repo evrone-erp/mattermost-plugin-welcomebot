@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/handler"
+	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase/command"
 	"github.com/mattermost/mattermost/server/public/model"
 )
@@ -14,16 +15,21 @@ func (c *DeletePublishedChanelWelcome) Trigger() string {
 	return "delete_published_channel_welcome"
 }
 
+func (c *DeletePublishedChanelWelcome) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
+	return p.IsSysadmin(args.UserId) || p.CanManageChannel(args.UserId, args.ChannelId)
+}
+
 func (c *DeletePublishedChanelWelcome) Help() string {
 	return "`/welcomebot delete_published_channel_welcome` - delete the published welcome message for the given channel (if any)"
 }
 
 func (c *DeletePublishedChanelWelcome) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
-	command.DeletePublishedChanelWelcome(
-		p.Container().NewCommandMessenger(args),
-		p.Container().ChannelWelcomeRepo(),
-		args.ChannelId,
-	)
+	cmd := command.DeletePublishedChanelWelcome{
+		CommandMessenger:   p.Container().NewCommandMessenger(args),
+		ChannelWelcomeRepo: p.Container().ChannelWelcomeRepo(),
+	}
+
+	cmd.Call(args.ChannelId)
 }
 
 func (c *DeletePublishedChanelWelcome) Validate(parameters []string) error {

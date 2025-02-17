@@ -45,3 +45,31 @@ func TestChannelRepoGetDirect(t *testing.T) {
 		assert.Nil(t, err)
 	})
 }
+
+func TestChannelRepoGetByName(t *testing.T) {
+	t.Run("happy path", func(t *testing.T) {
+		r, api := setupChannelRepo()
+
+		channel := &model.Channel{Id: "channel-id"}
+		api.On("GetChannelByName", "team-id", "channelName", false).Return(channel, nil)
+
+		result, err := r.GetByName("team-id", "channelName")
+
+		assert.Equal(t, channel, result)
+		assert.Nil(t, err)
+	})
+}
+
+func TestAddMemberByUserID(t *testing.T) {
+	t.Run("happy path", func(t *testing.T) {
+		r, api := setupChannelRepo()
+
+		member := &model.ChannelMember{UserId: "user-id", ChannelId: "channel-id"}
+		api.On("AddChannelMember", "channel-id", "user-id").Return(member, nil)
+
+		result, err := r.AddMemberByUserID("channel-id", "user-id")
+
+		assert.Equal(t, member, result)
+		assert.Nil(t, err)
+	})
+}

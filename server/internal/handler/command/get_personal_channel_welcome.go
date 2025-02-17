@@ -4,6 +4,8 @@ import (
 	"errors"
 
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/handler"
+	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/presenter"
+	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase/command"
 	"github.com/mattermost/mattermost/server/public/model"
 )
@@ -14,16 +16,22 @@ func (c *GetPersonalChanelWelcome) Trigger() string {
 	return "get_personal_channel_welcome"
 }
 
+func (c *GetPersonalChanelWelcome) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
+	return p.IsSysadmin(args.UserId) || p.CanManageChannel(args.UserId, args.ChannelId)
+}
+
 func (c *GetPersonalChanelWelcome) Help() string {
 	return "`/welcomebot get_personal_channel_welcome` - print the personal welcome message set for the given channel (if any)"
 }
 
 func (c *GetPersonalChanelWelcome) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
-	command.GetPersonalChanelWelcome(
-		p.Container().NewCommandMessenger(args),
-		p.Container().ChannelWelcomeRepo(),
-		args.ChannelId,
-	)
+	cmd := command.GetPersonalChanelWelcome{
+		CommandMessenger:        p.Container().NewCommandMessenger(args),
+		ChannelWelcomeRepo:      p.Container().ChannelWelcomeRepo(),
+		WelcomeMessagePresenter: &presenter.WelcomeMessagePresenter{UserRepo: p.Container().UserRepo()},
+	}
+
+	cmd.Call(args.UserId, args.ChannelId)
 }
 
 func (c *GetPersonalChanelWelcome) Validate(parameters []string) error {

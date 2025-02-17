@@ -11,13 +11,32 @@ import (
 func TestSetPublishedChanelWelcome(t *testing.T) {
 	channelID := "test-channel"
 
-	setupMocks := func() (*usecase.MockCommandMessenger, *usecase.MockChannelWelcomeRepo, *usecase.MockChannelRepo) {
-		m := new(usecase.MockCommandMessenger)
-		wr := new(usecase.MockChannelWelcomeRepo)
-		cr := new(usecase.MockChannelRepo)
-		m.On("PostCommandResponse", mock.Anything).Return()
+	type Setup struct {
+		CommandMessenger   *usecase.MockCommandMessenger
+		ChannelWelcomeRepo *usecase.MockChannelWelcomeRepo
+		ChannelRepo        *usecase.MockChannelRepo
+		Subject            *SetPublishedChanelWelcome
+	}
 
-		return m, wr, cr
+	setup := func() *Setup {
+		messenger := new(usecase.MockCommandMessenger)
+		channelWelcomeRepo := new(usecase.MockChannelWelcomeRepo)
+		channelRepo := new(usecase.MockChannelRepo)
+
+		messenger.On("PostCommandResponse", mock.Anything).Return()
+
+		subject := &SetPublishedChanelWelcome{
+			CommandMessenger:   messenger,
+			ChannelWelcomeRepo: channelWelcomeRepo,
+			ChannelRepo:        channelRepo,
+		}
+
+		return &Setup{
+			CommandMessenger:   messenger,
+			ChannelWelcomeRepo: channelWelcomeRepo,
+			ChannelRepo:        channelRepo,
+			Subject:            subject,
+		}
 	}
 
 	validChannel := &model.Channel{
@@ -28,83 +47,82 @@ func TestSetPublishedChanelWelcome(t *testing.T) {
 	validCommand := "set_published_channel_welcome foo bar keke   "
 
 	t.Run("happy path", func(t *testing.T) {
-		m, wr, cr := setupMocks()
+		s := setup()
 
-		wr.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
-		cr.On("Get", channelID).Return(validChannel, nil)
+		s.ChannelWelcomeRepo.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
+		s.ChannelRepo.On("Get", channelID).Return(validChannel, nil)
 
-		SetPublishedChanelWelcome(m, wr, cr, validCommand, channelID)
+		s.Subject.Call(validCommand, channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "stored the welcome message:\nfoo bar keke")
-		wr.AssertCalled(t, "SetPublishedChanelWelcome", "test-channel", "foo bar keke")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
-		wr.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 1)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "stored the welcome message:\nfoo bar keke")
+		s.ChannelWelcomeRepo.AssertCalled(t, "SetPublishedChanelWelcome", "test-channel", "foo bar keke")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.ChannelWelcomeRepo.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 1)
 	})
 
 	t.Run("with broken command", func(t *testing.T) {
-		m, wr, cr := setupMocks()
+		s := setup()
 
-		wr.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
-		cr.On("Get", channelID).Return(validChannel, nil)
+		s.ChannelWelcomeRepo.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
+		s.ChannelRepo.On("Get", channelID).Return(validChannel, nil)
 
-		SetPublishedChanelWelcome(m, wr, cr, "kek", channelID)
+		s.Subject.Call("kek", channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "error ocured while parsing command kek")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
-		wr.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 0)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "error ocured while parsing command kek")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.ChannelWelcomeRepo.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 0)
 	})
 
 	t.Run("with a command without message", func(t *testing.T) {
-		m, wr, cr := setupMocks()
+		s := setup()
 
-		wr.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
-		cr.On("Get", channelID).Return(validChannel, nil)
+		s.ChannelWelcomeRepo.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
+		s.ChannelRepo.On("Get", channelID).Return(validChannel, nil)
 
-		SetPublishedChanelWelcome(m, wr, cr, "set_published_channel_welcome     ", channelID)
+		s.Subject.Call("set_published_channel_welcome     ", channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "unable to store empty message")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
-		wr.AssertNumberOfCalls(t, "SetPersonalChanelWelcome", 0)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "unable to store empty message")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.ChannelWelcomeRepo.AssertNumberOfCalls(t, "SetPersonalChanelWelcome", 0)
 	})
 
 	t.Run("private channel", func(t *testing.T) {
-		m, wr, cr := setupMocks()
+		s := setup()
 
-		wr.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
+		s.ChannelWelcomeRepo.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
 		privateChannel := &model.Channel{
 			Id:   channelID,
 			Type: model.ChannelTypePrivate,
 		}
-		cr.On("Get", channelID).Return(privateChannel, nil)
+		s.ChannelRepo.On("Get", channelID).Return(privateChannel, nil)
 
-		SetPublishedChanelWelcome(m, wr, cr, validCommand, channelID)
+		s.Subject.Call(validCommand, channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "welcome messages are not supported for direct channels")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
-		wr.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 0)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "welcome messages are not supported for direct channels")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.ChannelWelcomeRepo.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 0)
 	})
 
 	t.Run("persist message error", func(t *testing.T) {
-		m, wr, cr := setupMocks()
+		s := setup()
+		s.ChannelWelcomeRepo.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(&model.AppError{Message: "persist error"})
+		s.ChannelRepo.On("Get", channelID).Return(validChannel, nil)
 
-		wr.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(&model.AppError{Message: "persist error"})
-		cr.On("Get", channelID).Return(validChannel, nil)
+		s.Subject.Call(validCommand, channelID)
 
-		SetPublishedChanelWelcome(m, wr, cr, validCommand, channelID)
-
-		m.AssertCalled(t, "PostCommandResponse", "error occurred while storing the welcome message for the chanel: `persist error`")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
-		wr.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 1)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "error occurred while storing the welcome message for the chanel: `persist error`")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.ChannelWelcomeRepo.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 1)
 	})
 
 	t.Run("retrieve channel error", func(t *testing.T) {
-		m, wr, cr := setupMocks()
-		cr.On("Get", channelID).Return(nil, &model.AppError{Message: "receiving error"})
+		s := setup()
+		s.ChannelRepo.On("Get", channelID).Return(nil, &model.AppError{Message: "receiving error"})
 
-		SetPublishedChanelWelcome(m, wr, cr, validCommand, channelID)
+		s.Subject.Call(validCommand, channelID)
 
-		m.AssertCalled(t, "PostCommandResponse", "error occurred while checking the type of the chanelId `test-channel`: `receiving error`")
-		m.AssertNumberOfCalls(t, "PostCommandResponse", 1)
-		wr.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 0)
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "error occurred while checking the type of the chanelId `test-channel`: `receiving error`")
+		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
+		s.ChannelWelcomeRepo.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 0)
 	})
 }

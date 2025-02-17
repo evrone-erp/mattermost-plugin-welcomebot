@@ -27,90 +27,115 @@ func TestNotifyWithPersonalWelcome(t *testing.T) {
 		UserId:    userID,
 	}
 
-	setupMocks := func() (*usecase.MockChannelWelcomeRepo, *usecase.MockChannelRepo, *usecase.MockMessenger) {
-		m := new(usecase.MockMessenger)
-		wr := new(usecase.MockChannelWelcomeRepo)
-		cr := new(usecase.MockChannelRepo)
+	type Setup struct {
+		Messenger               *usecase.MockMessenger
+		ChannelWelcomeRepo      *usecase.MockChannelWelcomeRepo
+		ChannelRepo             *usecase.MockChannelRepo
+		WelcomeMessagePresenter *usecase.MockWelcomeMessagePresenter
+		Subject                 *NotifyWithPersonalWelcome
+	}
 
-		m.On("PostChannelEphemeral", mock.Anything, mock.Anything, mock.Anything).Return()
+	setup := func() *Setup {
+		messenger := new(usecase.MockMessenger)
+		channelWelcomeRepo := new(usecase.MockChannelWelcomeRepo)
+		channelRepo := new(usecase.MockChannelRepo)
+		welcomeMessagePresenter := new(usecase.MockWelcomeMessagePresenter)
 
-		return wr, cr, m
+		messenger.On("PostChannelEphemeral", mock.Anything, mock.Anything, mock.Anything).Return()
+
+		subject := &NotifyWithPersonalWelcome{
+			Messenger:               messenger,
+			ChannelWelcomeRepo:      channelWelcomeRepo,
+			ChannelRepo:             channelRepo,
+			WelcomeMessagePresenter: welcomeMessagePresenter,
+		}
+
+		return &Setup{
+			Messenger:               messenger,
+			ChannelWelcomeRepo:      channelWelcomeRepo,
+			ChannelRepo:             channelRepo,
+			WelcomeMessagePresenter: welcomeMessagePresenter,
+			Subject:                 subject,
+		}
 	}
 
 	t.Run("happy path", func(t *testing.T) {
-		wr, cr, m := setupMocks()
-		m.On("PostDirect", mock.Anything, mock.Anything).Return(nil)
-		cr.On("Get", "group-channel-id").Return(groupChannel, nil)
-		cr.On("GetDirect", userID).Return(directChannel, nil)
-		wr.On("GetPersonalChanelWelcome", "group-channel-id").Return(&pmodel.ChannelWelcome{Message: "Hello, friend!"}, nil)
+		s := setup()
 
-		NotifyWithPersonalWelcome(wr, cr, m, channelMember)
+		s.Messenger.On("PostDirect", mock.Anything, mock.Anything).Return(nil)
+		s.ChannelRepo.On("Get", "group-channel-id").Return(groupChannel, nil)
+		s.ChannelRepo.On("GetDirect", userID).Return(directChannel, nil)
+		s.ChannelWelcomeRepo.On("GetPersonalChanelWelcome", "group-channel-id").Return(&pmodel.ChannelWelcome{Message: "hello"}, nil)
+		s.WelcomeMessagePresenter.On("Render", "hello", "user-id").Return("Hello, friend!", nil)
 
-		m.AssertCalled(t, "PostDirect", "direct-channel-id", "Hello, friend!")
-		m.AssertCalled(t, "PostChannelEphemeral", "group-channel-id", "user-id", "Hello, friend!")
+		s.Subject.Call(channelMember)
 
-		m.AssertNumberOfCalls(t, "PostDirect", 1)
-		m.AssertNumberOfCalls(t, "PostChannelEphemeral", 1)
+		s.Messenger.AssertCalled(t, "PostDirect", "direct-channel-id", "Hello, friend!")
+		s.Messenger.AssertCalled(t, "PostChannelEphemeral", "group-channel-id", "user-id", "Hello, friend!")
+
+		s.Messenger.AssertNumberOfCalls(t, "PostDirect", 1)
+		s.Messenger.AssertNumberOfCalls(t, "PostChannelEphemeral", 1)
 	})
 
 	t.Run("no stored message", func(t *testing.T) {
-		wr, cr, m := setupMocks()
-		m.On("PostDirect", mock.Anything, mock.Anything).Return(nil)
-		cr.On("Get", "group-channel-id").Return(groupChannel, nil)
-		wr.On("GetPersonalChanelWelcome", "group-channel-id").Return(nil, nil)
-		cr.On("GetDirect", userID).Return(directChannel, nil)
+		s := setup()
+		s.Messenger.On("PostDirect", mock.Anything, mock.Anything).Return(nil)
+		s.ChannelRepo.On("Get", "group-channel-id").Return(groupChannel, nil)
+		s.ChannelWelcomeRepo.On("GetPersonalChanelWelcome", "group-channel-id").Return(nil, nil)
+		s.ChannelRepo.On("GetDirect", userID).Return(directChannel, nil)
 
-		NotifyWithPersonalWelcome(wr, cr, m, channelMember)
+		s.Subject.Call(channelMember)
 
-		m.AssertNumberOfCalls(t, "PostDirect", 0)
-		m.AssertNumberOfCalls(t, "PostChannelEphemeral", 0)
+		s.Messenger.AssertNumberOfCalls(t, "PostDirect", 0)
+		s.Messenger.AssertNumberOfCalls(t, "PostChannelEphemeral", 0)
 	})
 
 	t.Run("error during direct message", func(t *testing.T) {
-		wr, cr, m := setupMocks()
-		cr.On("Get", "group-channel-id").Return(groupChannel, nil)
-		cr.On("GetDirect", userID).Return(directChannel, nil)
-		wr.On("GetPersonalChanelWelcome", "group-channel-id").Return(&pmodel.ChannelWelcome{Message: "Hello, friend!"}, nil)
-		m.On("PostDirect", "direct-channel-id", "Hello, friend!").Return(&mmodel.AppError{Message: "foo"})
+		s := setup()
+		s.ChannelRepo.On("Get", "group-channel-id").Return(groupChannel, nil)
+		s.ChannelRepo.On("GetDirect", userID).Return(directChannel, nil)
+		s.WelcomeMessagePresenter.On("Render", "Hello", "user-id").Return("Hello, friend!", nil)
+		s.ChannelWelcomeRepo.On("GetPersonalChanelWelcome", "group-channel-id").Return(&pmodel.ChannelWelcome{Message: "Hello"}, nil)
+		s.Messenger.On("PostDirect", "direct-channel-id", "Hello, friend!").Return(&mmodel.AppError{Message: "foo"})
 
-		NotifyWithPersonalWelcome(wr, cr, m, channelMember)
+		s.Subject.Call(channelMember)
 
-		m.AssertCalled(t, "PostChannelEphemeral", "group-channel-id", "user-id", "Hello, friend!")
+		s.Messenger.AssertCalled(t, "PostChannelEphemeral", "group-channel-id", "user-id", "Hello, friend!")
 
-		m.AssertNumberOfCalls(t, "PostDirect", 1)
-		m.AssertNumberOfCalls(t, "PostChannelEphemeral", 1)
+		s.Messenger.AssertNumberOfCalls(t, "PostDirect", 1)
+		s.Messenger.AssertNumberOfCalls(t, "PostChannelEphemeral", 1)
 	})
 
 	t.Run("error fetching direct", func(t *testing.T) {
-		wr, cr, m := setupMocks()
-		cr.On("Get", "group-channel-id").Return(groupChannel, nil)
-		cr.On("GetDirect", userID).Return(nil, &mmodel.AppError{Message: "foo"})
-		wr.On("GetPersonalChanelWelcome", "group-channel-id").Return(&pmodel.ChannelWelcome{Message: "Hello, friend!"}, nil)
+		s := setup()
+		s.ChannelRepo.On("Get", "group-channel-id").Return(groupChannel, nil)
+		s.ChannelRepo.On("GetDirect", userID).Return(nil, &mmodel.AppError{Message: "foo"})
+		s.ChannelWelcomeRepo.On("GetPersonalChanelWelcome", "group-channel-id").Return(&pmodel.ChannelWelcome{Message: "Hello, friend!"}, nil)
 
-		NotifyWithPersonalWelcome(wr, cr, m, channelMember)
+		s.Subject.Call(channelMember)
 
-		m.AssertNumberOfCalls(t, "PostDirect", 0)
-		m.AssertNumberOfCalls(t, "PostChannelEphemeral", 0)
+		s.Messenger.AssertNumberOfCalls(t, "PostDirect", 0)
+		s.Messenger.AssertNumberOfCalls(t, "PostChannelEphemeral", 0)
 	})
 
 	t.Run("error while fetching personal welcome", func(t *testing.T) {
-		wr, cr, m := setupMocks()
-		cr.On("Get", "group-channel-id").Return(groupChannel, nil)
-		wr.On("GetPersonalChanelWelcome", "group-channel-id").Return(nil, &mmodel.AppError{Message: "foo"})
+		s := setup()
+		s.ChannelRepo.On("Get", "group-channel-id").Return(groupChannel, nil)
+		s.ChannelWelcomeRepo.On("GetPersonalChanelWelcome", "group-channel-id").Return(nil, &mmodel.AppError{Message: "foo"})
 
-		NotifyWithPersonalWelcome(wr, cr, m, channelMember)
+		s.Subject.Call(channelMember)
 
-		m.AssertNumberOfCalls(t, "PostDirect", 0)
-		m.AssertNumberOfCalls(t, "PostChannelEphemeral", 0)
+		s.Messenger.AssertNumberOfCalls(t, "PostDirect", 0)
+		s.Messenger.AssertNumberOfCalls(t, "PostChannelEphemeral", 0)
 	})
 
 	t.Run("errro while fetching channel", func(t *testing.T) {
-		wr, cr, m := setupMocks()
-		cr.On("Get", "group-channel-id").Return(nil, &mmodel.AppError{Message: "foo"})
+		s := setup()
+		s.ChannelRepo.On("Get", "group-channel-id").Return(nil, &mmodel.AppError{Message: "foo"})
 
-		NotifyWithPersonalWelcome(wr, cr, m, channelMember)
+		s.Subject.Call(channelMember)
 
-		m.AssertNumberOfCalls(t, "PostDirect", 0)
-		m.AssertNumberOfCalls(t, "PostChannelEphemeral", 0)
+		s.Messenger.AssertNumberOfCalls(t, "PostDirect", 0)
+		s.Messenger.AssertNumberOfCalls(t, "PostChannelEphemeral", 0)
 	})
 }
