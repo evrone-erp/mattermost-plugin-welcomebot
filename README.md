@@ -2,23 +2,6 @@
 
 **This fork builds on the original Mattermost WelcomeBot plugin, allowing channel moderators to manage team and channel welcome messages and actions directly through Mattermost commands — no server file modifications required.**
 
-# Welcome Bot Evrone Plugin
-
-[![Build Status](https://img.shields.io/circleci/project/github/mattermost/mattermost-plugin-welcomebot/master)](https://circleci.com/gh/mattermost/mattermost-plugin-welcomebot)
-[![Code Coverage](https://img.shields.io/codecov/c/github/mattermost/mattermost-plugin-welcomebot/master)](https://codecov.io/gh/mattermost/mattermost-plugin-welcomebot)
-[![Release](https://img.shields.io/github/v/release/mattermost/mattermost-plugin-welcomebot)](https://github.com/mattermost/mattermost-plugin-welcomebot/releases/latest)
-[![HW](https://img.shields.io/github/issues/mattermost/mattermost-plugin-welcomebot/Up%20For%20Grabs?color=dark%20green&label=Help%20Wanted)](https://github.com/mattermost/mattermost-plugin-welcomebot/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Up+For+Grabs%22+label%3A%22Help+Wanted%22)
-
-**Maintainer:** [@mickmister](https://github.com/mickmister)
-
-Use this plugin to improve onboarding and HR processes. It adds a Welcome Bot that helps welcome users to teams and/or channels as well as easily join channels based on selections.
-
-![image](https://user-images.githubusercontent.com/13119842/58736467-fd226400-83cb-11e9-827b-6bbe33d062ab.png)
-
-*Welcome a new team member to Mattermost Contributors team. Then add the user to a set of channels based on their selection.*
-
-![image](https://user-images.githubusercontent.com/13119842/58736540-30fd8980-83cc-11e9-8e8e-94ea3042b3b1.png)
-
 ## Configuration
 
 1. Go to **System Console > Plugins > Management** and click **Enable** to enable the Welcome Bot plugin.
@@ -27,16 +10,37 @@ Use this plugin to improve onboarding and HR processes. It adds a Welcome Bot th
 2. Please ensure that you go to **System Console > Site Configuration > Users and Teams** and verify the setting for **Enable users to open Direct Message channels with:**. If the value of this field is set to `Any member of the team`, you'll need to add the welcome bot manually to all the teams where it needs to be included.
 
 ## Usage
+You can preview configured messages and create a channel welcome message using the following bot commands:  
 
-The preview of the configured messages, as well as the creation of a channel welcome message, can be done via bot commands:
-* `/welcomebot help` - Displays usage information.
-* `/welcomebot list_channel_welcomes` - Lists channels with welcome messages
-* `/welcomebot set_personal_channel_welcome [welcome-message]` - Sets the given text as current's channel personal welcome message.
-* `/welcomebot get_personal_channel_welcome` - Gets the current channel's personal welcome message.
-* `/welcomebot delete_personal_channel_welcome` - Deletes the current channel's personal welcome message.
-* `/welcomebot set_published_channel_welcome [welcome-message]` - Sets the given text as current's channel published (visible for all) welcome message.
-* `/welcomebot get_published_channel_welcome` - Gets the current channel's published (visible for all) welcome message.
-* `/welcomebot delete_published_channel_welcome` - Deletes the current channel's published (visible for all) welcome message.
+* `/welcomebot help` - Displays usage information.  
+* `/welcomebot list_channel_welcomes` - Lists channels with configured welcome messages.  
+* `/welcomebot set_personal_channel_welcome [welcome-message]` - Sets the given text as the current channel's personal welcome message.  
+* `/welcomebot get_personal_channel_welcome` - Retrieves the current channel's personal welcome message.  
+* `/welcomebot delete_personal_channel_welcome` - Deletes the current channel's personal welcome message.  
+* `/welcomebot set_published_channel_welcome [welcome-message]` - Sets the given text as the current channel's published (visible to all members) welcome message.  
+* `/welcomebot get_published_channel_welcome` - Retrieves the current channel's published (visible to all members) welcome message.  
+* `/welcomebot delete_published_channel_welcome` - Deletes the current channel's published welcome message.  
+* `/welcomebot get_team_welcome` - Displays the team welcome message and the default channels.  
+* `/welcomebot set_team_welcome_message [welcome-message]` - Sets the current team's welcome message.  
+* `/welcomebot remove_team_welcome` - Removes the current team's welcome message.  
+* `/welcomebot add_team_default_channels [~channel_name,]` - Adds default channels for the team welcome message.  
+* `/welcomebot remove_team_default_channels [~channel_name,]` - Removes default channels from the team welcome message.  
+
+### Message Visibility  
+
+- **Personal channel welcome messages** are sent as direct messages and also posted in the channel, but only visible to the user.  
+- **Published channel welcome messages** are sent to the channel and visible to all channel members.  
+- **Team welcome messages** are sent as direct messages.  
+
+### Message Templates  
+
+Welcome messages support a simple templating system:  
+
+* `{{.UserDisplayName}}` - Example: `John Doe`  
+* `{{.UserHandleName}}` - Example: `@john_doe`  
+
+When previewing a message, all template placeholders will be replaced with the current user's details.  
+
 
 ## Development
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/handler"
+	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase/command"
 	"github.com/mattermost/mattermost/server/public/model"
 )
@@ -14,16 +15,22 @@ func (c *ListChannelWelcomes) Trigger() string {
 	return "list_channel_welcomes"
 }
 
+func (c *ListChannelWelcomes) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
+	return p.IsSysadmin(args.UserId)
+}
+
 func (c *ListChannelWelcomes) Help() string {
 	return "`/welcomebot list_channel_welcomes` - print all channels with configured welcome messages"
 }
 
 func (c *ListChannelWelcomes) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
-	command.ListChannelWelcomes(
-		p.Container().NewCommandMessenger(args),
-		p.Container().ChannelWelcomeRepo(),
-		p.Container().ChannelRepo(),
-	)
+	cmd := command.ListChannelWelcomes{
+		CommandMessenger:   p.Container().NewCommandMessenger(args),
+		ChannelWelcomeRepo: p.Container().ChannelWelcomeRepo(),
+		ChannelRepo:        p.Container().ChannelRepo(),
+	}
+
+	cmd.Call()
 }
 
 func (c *ListChannelWelcomes) Validate(parameters []string) error {
