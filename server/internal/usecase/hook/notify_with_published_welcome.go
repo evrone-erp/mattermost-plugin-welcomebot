@@ -8,13 +8,15 @@ import (
 	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )
 
-func NotifyWithPublishedWelcome(
-	wr usecase.ChannelWelcomeRepo,
-	cr usecase.ChannelRepo,
-	m usecase.Messenger,
-	channelMember *model.ChannelMember,
-) {
-	if channelInfo, appErr := cr.Get(channelMember.ChannelId); appErr != nil {
+type NotifyWithPublishedWelcome struct {
+	Messenger               usecase.Messenger
+	ChannelWelcomeRepo      usecase.ChannelWelcomeRepo
+	ChannelRepo             usecase.ChannelRepo
+	WelcomeMessagePresenter usecase.WelcomeMessagePresenter
+}
+
+func (uc *NotifyWithPublishedWelcome) Call(channelMember *model.ChannelMember) {
+	if channelInfo, appErr := uc.ChannelRepo.Get(channelMember.ChannelId); appErr != nil {
 		mlog.Error(
 			"error occurred while checking the type of the chanel",
 			mlog.String("channelId", channelMember.ChannelId),
@@ -25,7 +27,7 @@ func NotifyWithPublishedWelcome(
 		return
 	}
 
-	welcome, appErr := wr.GetPublishedChanelWelcome(channelMember.ChannelId)
+	welcome, appErr := uc.ChannelWelcomeRepo.GetPublishedChanelWelcome(channelMember.ChannelId)
 	if appErr != nil {
 		mlog.Error(
 			"error occurred while retrieving the welcome message",
@@ -39,8 +41,19 @@ func NotifyWithPublishedWelcome(
 		return
 	}
 
+	message, err := uc.WelcomeMessagePresenter.Render(welcome.Message, channelMember.UserId)
+
+	if err != nil {
+		mlog.Error(
+			"Error while rendering message %s: %s",
+			mlog.String("UserId", channelMember.UserId),
+			mlog.Err(err),
+		)
+		return
+	}
+
 	time.Sleep(1 * time.Second)
-	appErr = m.Post(channelMember.ChannelId, welcome.Message)
+	appErr = uc.Messenger.Post(channelMember.ChannelId, message)
 
 	if appErr != nil {
 		mlog.Error(

@@ -6,24 +6,34 @@ import (
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 )
 
-func GetPersonalChanelWelcome(
-	m usecase.CommandMessenger,
-	wr usecase.ChannelWelcomeRepo,
-	channelID string,
-) {
-	welcome, appErr := wr.GetPersonalChanelWelcome(channelID)
+type GetPersonalChanelWelcome struct {
+	CommandMessenger        usecase.CommandMessenger
+	ChannelWelcomeRepo      usecase.ChannelWelcomeRepo
+	WelcomeMessagePresenter usecase.WelcomeMessagePresenter
+}
+
+func (uc *GetPersonalChanelWelcome) Call(currentUserID string, channelID string) {
+	welcome, appErr := uc.ChannelWelcomeRepo.GetPersonalChanelWelcome(channelID)
 
 	if appErr != nil {
 		message := fmt.Sprintf("error occurred while retrieving the welcome message for the chanel: `%s`", appErr)
-		m.PostCommandResponse(message)
+		uc.CommandMessenger.PostCommandResponse(message)
 		return
 	}
 
 	if welcome == nil {
-		m.PostCommandResponse("welcome message has not been set yet")
+		uc.CommandMessenger.PostCommandResponse("welcome message has not been set yet")
 		return
 	}
 
-	message := fmt.Sprintf("Welcome message is:\n%s", welcome.Message)
-	m.PostCommandResponse(message)
+	message, appErr := uc.WelcomeMessagePresenter.Render(welcome.Message, currentUserID)
+
+	if appErr != nil {
+		response := fmt.Sprintf("Error while rendering message %s: %s", currentUserID, appErr)
+		uc.CommandMessenger.PostCommandResponse(response)
+		return
+	}
+
+	message = fmt.Sprintf("Welcome message is:\n%s", message)
+	uc.CommandMessenger.PostCommandResponse(message)
 }

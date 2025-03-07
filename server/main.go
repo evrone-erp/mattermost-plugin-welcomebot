@@ -19,10 +19,17 @@ func main() {
 	corePlugin.RegisterCommand(&command.SetPublishedChanelWelcome{})
 	corePlugin.RegisterCommand(&command.DeletePublishedChanelWelcome{})
 
+	corePlugin.RegisterCommand(&command.GetTeamWelcome{})
+	corePlugin.RegisterCommand(&command.SetTeamWelcomeMessage{})
+	corePlugin.RegisterCommand(&command.RemoveTeamWelcomeMessage{})
+
 	corePlugin.RegisterCommand(&command.ListChannelWelcomes{})
+	corePlugin.RegisterCommand(&command.AddTeamDefaultChannels{})
+	corePlugin.RegisterCommand(&command.RemoveTeamDefaultChannels{})
 
 	corePlugin.RegisterUserHasJoinedChannelHook(&hook.PersonalWelcomeNotifier{})
 	corePlugin.RegisterUserHasJoinedChannelHook(&hook.PublishedWelcomeNotifier{})
+	corePlugin.RegisterUserHasJoinedTeamHook(&hook.TeamWelcomeNotifier{})
 
 	plugin.ClientMain(&corePlugin)
 }

@@ -8,13 +8,15 @@ import (
 	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )
 
-func NotifyWithPersonalWelcome(
-	wr usecase.ChannelWelcomeRepo,
-	cr usecase.ChannelRepo,
-	m usecase.Messenger,
-	channelMember *model.ChannelMember,
-) {
-	if channelInfo, appErr := cr.Get(channelMember.ChannelId); appErr != nil {
+type NotifyWithPersonalWelcome struct {
+	Messenger               usecase.Messenger
+	ChannelWelcomeRepo      usecase.ChannelWelcomeRepo
+	ChannelRepo             usecase.ChannelRepo
+	WelcomeMessagePresenter usecase.WelcomeMessagePresenter
+}
+
+func (uc *NotifyWithPersonalWelcome) Call(channelMember *model.ChannelMember) {
+	if channelInfo, appErr := uc.ChannelRepo.Get(channelMember.ChannelId); appErr != nil {
 		mlog.Error(
 			"error occurred while checking the type of the chanel",
 			mlog.String("channelId", channelMember.ChannelId),
@@ -25,7 +27,7 @@ func NotifyWithPersonalWelcome(
 		return
 	}
 
-	welcome, appErr := wr.GetPersonalChanelWelcome(channelMember.ChannelId)
+	welcome, appErr := uc.ChannelWelcomeRepo.GetPersonalChanelWelcome(channelMember.ChannelId)
 	if appErr != nil {
 		mlog.Error(
 			"error occurred while retrieving the welcome message",
@@ -39,7 +41,7 @@ func NotifyWithPersonalWelcome(
 		return
 	}
 
-	dmChannel, err := cr.GetDirect(channelMember.UserId)
+	dmChannel, err := uc.ChannelRepo.GetDirect(channelMember.UserId)
 	if err != nil {
 		mlog.Error(
 			"error occurred while creating direct channel to the user",
@@ -49,7 +51,18 @@ func NotifyWithPersonalWelcome(
 		return
 	}
 
-	if appErr := m.PostDirect(dmChannel.Id, welcome.Message); appErr != nil {
+	message, err := uc.WelcomeMessagePresenter.Render(welcome.Message, channelMember.UserId)
+
+	if err != nil {
+		mlog.Error(
+			"Error while rendering message %s: %s",
+			mlog.String("UserId", channelMember.UserId),
+			mlog.Err(err),
+		)
+		return
+	}
+
+	if appErr := uc.Messenger.PostDirect(dmChannel.Id, message); appErr != nil {
 		mlog.Error("failed to post welcome message to the channel",
 			mlog.String("channelId", dmChannel.Id),
 			mlog.Err(appErr),
@@ -57,5 +70,5 @@ func NotifyWithPersonalWelcome(
 	}
 
 	time.Sleep(1 * time.Second)
-	m.PostChannelEphemeral(channelMember.ChannelId, channelMember.UserId, welcome.Message)
+	uc.Messenger.PostChannelEphemeral(channelMember.ChannelId, channelMember.UserId, message)
 }

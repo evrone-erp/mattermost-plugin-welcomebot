@@ -8,22 +8,22 @@ import (
 	"github.com/mattermost/mattermost/server/public/model"
 )
 
-func SetPersonalChanelWelcome(
-	m usecase.CommandMessenger,
-	wr usecase.ChannelWelcomeRepo,
-	cr usecase.ChannelRepo,
-	fullCommand string,
-	channelID string,
-) {
-	channel, appErr := cr.Get(channelID)
+type SetPersonalChanelWelcome struct {
+	CommandMessenger   usecase.CommandMessenger
+	ChannelWelcomeRepo usecase.ChannelWelcomeRepo
+	ChannelRepo        usecase.ChannelRepo
+}
+
+func (uc *SetPersonalChanelWelcome) Call(fullCommand string, channelID string) {
+	channel, appErr := uc.ChannelRepo.Get(channelID)
 	if appErr != nil {
 		response := fmt.Sprintf("error occurred while checking the type of the chanelId `%s`: `%s`", channelID, appErr)
-		m.PostCommandResponse(response)
+		uc.CommandMessenger.PostCommandResponse(response)
 		return
 	}
 
 	if channel.Type == model.ChannelTypePrivate {
-		m.PostCommandResponse("welcome messages are not supported for direct channels")
+		uc.CommandMessenger.PostCommandResponse("welcome messages are not supported for direct channels")
 		return
 	}
 
@@ -31,7 +31,7 @@ func SetPersonalChanelWelcome(
 
 	if len(parsedCommand) != 2 {
 		response := fmt.Sprintf("error ocured while parsing command %s", fullCommand)
-		m.PostCommandResponse(response)
+		uc.CommandMessenger.PostCommandResponse(response)
 
 		return
 	}
@@ -40,16 +40,16 @@ func SetPersonalChanelWelcome(
 	message = strings.TrimSpace(message)
 
 	if message == "" {
-		m.PostCommandResponse("unable to store empty message")
+		uc.CommandMessenger.PostCommandResponse("unable to store empty message")
 		return
 	}
 
-	if appErr := wr.SetPersonalChanelWelcome(channel.Id, message); appErr != nil {
+	if appErr := uc.ChannelWelcomeRepo.SetPersonalChanelWelcome(channel.Id, message); appErr != nil {
 		response := fmt.Sprintf("error occurred while storing the welcome message for the chanel: `%s`", appErr)
-		m.PostCommandResponse(response)
+		uc.CommandMessenger.PostCommandResponse(response)
 		return
 	}
 
 	response := fmt.Sprintf("stored the welcome message:\n%s", message)
-	m.PostCommandResponse(response)
+	uc.CommandMessenger.PostCommandResponse(response)
 }
