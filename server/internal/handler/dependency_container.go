@@ -10,4 +10,8 @@ type DependencyContainer interface {
 	ChannelWelcomeRepo() usecase.ChannelWelcomeRepo
 	NewCommandMessenger(*model.CommandArgs) usecase.CommandMessenger
 	Messenger() usecase.Messenger
+	TeamRepo() usecase.TeamRepo
+	TeamWelcomeRepo() usecase.TeamWelcomeRepo
+	Policy() usecase.Policy
+	UserRepo() usecase.UserRepo
 }

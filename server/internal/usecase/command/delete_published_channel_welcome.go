@@ -6,30 +6,31 @@ import (
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 )
 
-func DeletePublishedChanelWelcome(
-	m usecase.CommandMessenger,
-	wr usecase.ChannelWelcomeRepo,
-	channelID string,
-) {
-	welcome, err := wr.GetPublishedChanelWelcome(channelID)
+type DeletePublishedChanelWelcome struct {
+	CommandMessenger   usecase.CommandMessenger
+	ChannelWelcomeRepo usecase.ChannelWelcomeRepo
+}
+
+func (uc *DeletePublishedChanelWelcome) Call(channelID string) {
+	welcome, err := uc.ChannelWelcomeRepo.GetPublishedChanelWelcome(channelID)
 
 	if err != nil {
 		msg := fmt.Sprintf("error occurred while retrieving the welcome message for the chanel: `%s`", err)
-		m.PostCommandResponse(msg)
+		uc.CommandMessenger.PostCommandResponse(msg)
 		return
 	}
 
 	if welcome == nil {
-		m.PostCommandResponse("welcome message has not been set yet")
+		uc.CommandMessenger.PostCommandResponse("welcome message has not been set yet")
 		return
 	}
 
-	if err := wr.DeletePublishedChanelWelcome(channelID); err != nil {
+	if err := uc.ChannelWelcomeRepo.DeletePublishedChanelWelcome(channelID); err != nil {
 		msg := fmt.Sprintf("error occurred while deleting the welcome message for the chanel: `%s`", err)
-		m.PostCommandResponse(msg)
+		uc.CommandMessenger.PostCommandResponse(msg)
 
 		return
 	}
 
-	m.PostCommandResponse("welcome message has been deleted")
+	uc.CommandMessenger.PostCommandResponse("welcome message has been deleted")
 }
