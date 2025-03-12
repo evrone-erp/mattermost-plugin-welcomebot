@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
-	"github.com/mattermost/mattermost/server/public/model"
+	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase/utils"
 )
 
 type SetPersonalChanelWelcome struct {
@@ -22,8 +22,8 @@ func (uc *SetPersonalChanelWelcome) Call(fullCommand string, channelID string) {
 		return
 	}
 
-	if channel.Type == model.ChannelTypePrivate {
-		uc.CommandMessenger.PostCommandResponse("welcome messages are not supported for direct channels")
+	if !utils.IsChannelWithWelcomeSupport(channel) {
+		uc.CommandMessenger.PostCommandResponse("Channel type is not supported")
 		return
 	}
 
