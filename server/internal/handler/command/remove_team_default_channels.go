@@ -26,7 +26,7 @@ func (c *RemoveTeamDefaultChannels) IsPermitted(p usecase.Policy, args *model.Co
 }
 
 func (c *RemoveTeamDefaultChannels) Help() string {
-	return "`/welcomebot remove_team_default_channels <[~channel], >` remove channels to automatically join after entering the team"
+	return "`/welcomebot remove_team_default_channels <[~channel],>` - Remove channels from the auto-join list when entering the **current team** team"
 }
 
 func (c *RemoveTeamDefaultChannels) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {

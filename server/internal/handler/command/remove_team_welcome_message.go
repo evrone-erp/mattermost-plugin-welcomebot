@@ -20,7 +20,7 @@ func (c *RemoveTeamWelcomeMessage) IsPermitted(p usecase.Policy, args *model.Com
 }
 
 func (c *RemoveTeamWelcomeMessage) Help() string {
-	return "`/welcomebot remove_team_welcome` - Remove welcome message after joining the team"
+	return "`/welcomebot remove_team_welcome` - Remove the welcome message for the **current team**"
 }
 
 func (c *RemoveTeamWelcomeMessage) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {

@@ -20,7 +20,7 @@ func (c *SetPersonalChanelWelcome) Trigger() string {
 }
 
 func (c *SetPersonalChanelWelcome) Help() string {
-	return "`/welcomebot set_personal_channel_welcome [welcome-message]` - set the personal welcome message for the given channel. Direct channels are not supported."
+	return "`/welcomebot set_personal_channel_welcome [welcome-message]` - Set a personal welcome message for the **current channel** (Direct channels are not supported)"
 }
 
 func (c *SetPersonalChanelWelcome) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {

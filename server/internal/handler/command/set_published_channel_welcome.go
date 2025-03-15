@@ -20,7 +20,7 @@ func (c *SetPublishedChanelWelcome) IsPermitted(p usecase.Policy, args *model.Co
 }
 
 func (c *SetPublishedChanelWelcome) Help() string {
-	return "`/welcomebot set_published_channel_welcome [welcome-message]` - set the published welcome message for the given channel. Direct channels are not supported."
+	return "`/welcomebot set_published_channel_welcome [welcome-message]` - Set a published welcome message for the **current channel** (Direct channels are not supported)"
 }
 
 func (c *SetPublishedChanelWelcome) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {

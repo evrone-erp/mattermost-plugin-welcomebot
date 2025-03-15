@@ -21,7 +21,7 @@ func (c *GetPublishedChanelWelcome) IsPermitted(p usecase.Policy, args *model.Co
 }
 
 func (c *GetPublishedChanelWelcome) Help() string {
-	return "`/welcomebot get_published_channel_welcome` - print the published welcome message set for the given channel (if any)"
+	return "`/welcomebot get_published_channel_welcome` - Display the published welcome message set for the **current channel** (if any)"
 }
 
 func (c *GetPublishedChanelWelcome) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {

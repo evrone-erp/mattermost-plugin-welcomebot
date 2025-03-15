@@ -21,7 +21,7 @@ func (c *GetTeamWelcome) IsPermitted(p usecase.Policy, args *model.CommandArgs) 
 }
 
 func (c *GetTeamWelcome) Help() string {
-	return "`/welcomebot get_team_welcome` - Get welcome message after joining the team"
+	return "`/welcomebot get_team_welcome` - Display the welcome message set for the **current team**"
 }
 
 func (c *GetTeamWelcome) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
