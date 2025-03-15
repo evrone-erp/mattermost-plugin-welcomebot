@@ -20,7 +20,7 @@ func (c *ListChannelWelcomes) IsPermitted(p usecase.Policy, args *model.CommandA
 }
 
 func (c *ListChannelWelcomes) Help() string {
-	return "`/welcomebot list_channel_welcomes` - print all channels with configured welcome messages"
+	return "`/welcomebot list_channel_welcomes` - List all channels with configured welcome messages"
 }
 
 func (c *ListChannelWelcomes) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {

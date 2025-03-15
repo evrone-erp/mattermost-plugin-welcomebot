@@ -12,7 +12,7 @@ import (
 type RemoveTeamWelcomeMessage struct{}
 
 func (c *RemoveTeamWelcomeMessage) Trigger() string {
-	return "remove_team_welcome"
+	return "remove_team_welcome_message"
 }
 
 func (c *RemoveTeamWelcomeMessage) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
@@ -20,7 +20,7 @@ func (c *RemoveTeamWelcomeMessage) IsPermitted(p usecase.Policy, args *model.Com
 }
 
 func (c *RemoveTeamWelcomeMessage) Help() string {
-	return "`/welcomebot remove_team_welcome` - Remove welcome message after joining the team"
+	return "`/welcomebot remove_team_welcome_message` - Remove the welcome message for the **current team**"
 }
 
 func (c *RemoveTeamWelcomeMessage) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
@@ -34,14 +34,14 @@ func (c *RemoveTeamWelcomeMessage) Execute(p handler.BotAPIProvider, args *model
 
 func (c *RemoveTeamWelcomeMessage) Validate(parameters []string) error {
 	if len(parameters) != 0 {
-		return errors.New("`remove_team_welcome` command does not accept any args")
+		return errors.New("`remove_team_welcome_message` command does not accept any args")
 	}
 
 	return nil
 }
 
 func (c *RemoveTeamWelcomeMessage) AutocompleteData() *model.AutocompleteData {
-	data := model.NewAutocompleteData("remove_team_welcome", "", "removes team welcome message")
+	data := model.NewAutocompleteData("remove_team_welcome_message", "", "removes team welcome message")
 
 	return data
 }

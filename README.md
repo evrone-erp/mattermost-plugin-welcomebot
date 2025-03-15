@@ -22,7 +22,7 @@ You can preview configured messages and create a channel welcome message using t
 * `/welcomebot delete_published_channel_welcome` - Deletes the current channel's published welcome message.  
 * `/welcomebot get_team_welcome` - Displays the team welcome message and the default channels.  
 * `/welcomebot set_team_welcome_message [welcome-message]` - Sets the current team's welcome message.  
-* `/welcomebot remove_team_welcome` - Removes the current team's welcome message.  
+* `/welcomebot remove_team_welcome_message` - Removes the current team's welcome message.  
 * `/welcomebot add_team_default_channels [~channel_name,]` - Adds default channels for the team welcome message.  
 * `/welcomebot remove_team_default_channels [~channel_name,]` - Removes default channels from the team welcome message.  
 

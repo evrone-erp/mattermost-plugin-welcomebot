@@ -20,7 +20,7 @@ func (c *DeletePublishedChanelWelcome) IsPermitted(p usecase.Policy, args *model
 }
 
 func (c *DeletePublishedChanelWelcome) Help() string {
-	return "`/welcomebot delete_published_channel_welcome` - delete the published welcome message for the given channel (if any)"
+	return "`/welcomebot delete_published_channel_welcome` - Delete the published welcome message for the **current channel** (if any)"
 }
 
 func (c *DeletePublishedChanelWelcome) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {

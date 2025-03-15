@@ -22,7 +22,7 @@ func (c *AddTeamDefaultChannels) Trigger() string {
 }
 
 func (c *AddTeamDefaultChannels) Help() string {
-	return "`/welcomebot add_team_default_channels <[~channel], >` add channels to automatically join after entering the team"
+	return "`/welcomebot add_team_default_channels <[~channel],>` - Add channels to automatically join when entering the **current team** team"
 }
 
 func (c *AddTeamDefaultChannels) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
