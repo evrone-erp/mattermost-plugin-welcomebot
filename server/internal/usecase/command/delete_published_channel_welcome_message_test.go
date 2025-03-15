@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestDeletePublishedChanelWelcome(t *testing.T) {
+func TestDeletePublishedChanelWelcomeMessage(t *testing.T) {
 	channelID := "test-channel"
 
 	type Setup struct {
 		CommandMessenger   *usecase.MockCommandMessenger
 		ChannelWelcomeRepo *usecase.MockChannelWelcomeRepo
-		Subject            *DeletePublishedChanelWelcome
+		Subject            *DeletePublishedChanelWelcomeMessage
 	}
 
 	setup := func() *Setup {
@@ -24,7 +24,7 @@ func TestDeletePublishedChanelWelcome(t *testing.T) {
 
 		commandMessenger.On("PostCommandResponse", mock.Anything).Return()
 
-		subject := &DeletePublishedChanelWelcome{
+		subject := &DeletePublishedChanelWelcomeMessage{
 			CommandMessenger:   commandMessenger,
 			ChannelWelcomeRepo: channelWelcomeRepo,
 		}

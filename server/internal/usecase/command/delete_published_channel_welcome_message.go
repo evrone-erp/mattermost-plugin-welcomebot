@@ -6,13 +6,13 @@ import (
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 )
 
-type DeletePersonalChanelWelcome struct {
+type DeletePublishedChanelWelcomeMessage struct {
 	CommandMessenger   usecase.CommandMessenger
 	ChannelWelcomeRepo usecase.ChannelWelcomeRepo
 }
 
-func (uc *DeletePersonalChanelWelcome) Call(channelID string) {
-	welcome, err := uc.ChannelWelcomeRepo.GetPersonalChanelWelcome(channelID)
+func (uc *DeletePublishedChanelWelcomeMessage) Call(channelID string) {
+	welcome, err := uc.ChannelWelcomeRepo.GetPublishedChanelWelcome(channelID)
 
 	if err != nil {
 		msg := fmt.Sprintf("error occurred while retrieving the welcome message for the chanel: `%s`", err)
@@ -25,7 +25,7 @@ func (uc *DeletePersonalChanelWelcome) Call(channelID string) {
 		return
 	}
 
-	if err := uc.ChannelWelcomeRepo.DeletePersonalChanelWelcome(channelID); err != nil {
+	if err := uc.ChannelWelcomeRepo.DeletePublishedChanelWelcome(channelID); err != nil {
 		msg := fmt.Sprintf("error occurred while deleting the welcome message for the chanel: `%s`", err)
 		uc.CommandMessenger.PostCommandResponse(msg)
 

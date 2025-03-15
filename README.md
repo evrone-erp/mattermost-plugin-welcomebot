@@ -12,32 +12,57 @@
 ## Usage
 You can preview configured messages and create a channel welcome message using the following bot commands:  
 
-* `/welcomebot help` - Displays usage information.  
-* `/welcomebot list_channel_welcomes` - Lists channels with configured welcome messages.  
-* `/welcomebot set_personal_channel_welcome [welcome-message]` - Sets the given text as the current channel's personal welcome message.  
-* `/welcomebot get_personal_channel_welcome` - Retrieves the current channel's personal welcome message.  
-* `/welcomebot delete_personal_channel_welcome` - Deletes the current channel's personal welcome message.  
-* `/welcomebot set_published_channel_welcome [welcome-message]` - Sets the given text as the current channel's published (visible to all members) welcome message.  
-* `/welcomebot get_published_channel_welcome` - Retrieves the current channel's published (visible to all members) welcome message.  
-* `/welcomebot delete_published_channel_welcome` - Deletes the current channel's published welcome message.  
-* `/welcomebot get_team_welcome` - Displays the team welcome message and the default channels.  
-* `/welcomebot set_team_welcome_message [welcome-message]` - Sets the current team's welcome message.  
-* `/welcomebot remove_team_welcome` - Removes the current team's welcome message.  
-* `/welcomebot add_team_default_channels [~channel_name,]` - Adds default channels for the team welcome message.  
-* `/welcomebot remove_team_default_channels [~channel_name,]` - Removes default channels from the team welcome message.  
+### Team Default Channels Management
+These commands allow you to manage channels that users automatically join when entering the current team.
+
+- `/welcomebot add_team_default_channels <[~channel]>`  
+  Add channels to automatically join when entering the current team.
+- `/welcomebot remove_team_default_channels <[~channel]>`  
+  Remove channels from the auto-join list when entering the current team.
+
+### Channel Welcome Messages  
+These commands manage welcome messages for **the current channel**.
+
+- `/welcomebot set_personal_channel_welcome_message [welcome-message]`  
+  Set a personal welcome message for the current channel (Direct channels are not supported).
+- `/welcomebot get_personal_channel_welcome_message`  
+  Display the personal welcome message set for the current channel (if any).
+- `/welcomebot delete_personal_channel_welcome_message`  
+  Delete the personal welcome message for the current channel (if any).
+- `/welcomebot set_published_channel_welcome_message [welcome-message]`  
+  Set a published welcome message for the current channel (Direct channels are not supported).
+- `/welcomebot get_published_channel_welcome_message`  
+  Display the published welcome message set for the current channel (if any).
+- `/welcomebot delete_published_channel_welcome_message`  
+  Delete the published welcome message for the current channel (if any).
+- `/welcomebot list_channel_welcomes`  
+  List all channels with configured welcome messages.
+
+### Team Welcome Messages  
+These commands manage the welcome message displayed after joining **the current team**.
+
+- `/welcomebot set_team_welcome_message [message]`  
+  Set the welcome message displayed after joining the current team.
+- `/welcomebot get_team_welcome_settings`  
+  Display the welcome settings set for the current team.
+- `/welcomebot delete_team_welcome_message`  
+  Delete the welcome message for the current team.
 
 ### Message Visibility  
 
-- **Personal channel welcome messages** are sent as direct messages and also posted in the channel, but only visible to the user.  
-- **Published channel welcome messages** are sent to the channel and visible to all channel members.  
-- **Team welcome messages** are sent as direct messages.  
+- **Personal Channel Welcome Messages**  
+  Sent as direct messages to the user and also posted in the channel, but only visible to the user. Note that channel messages visible only to a specific user are ephemeral, meaning they may disappear quickly, even if the user hasn't read them.
+- **Published Channel Welcome Messages**  
+  Sent to the channel and visible to all channel members.  
+- **Team Welcome Messages**  
+  Sent as direct messages to the user.  
 
 ### Message Templates  
 
-Welcome messages support a simple templating system:  
+Welcome messages support a simple templating system for user-specific placeholders:  
 
-* `{{.UserDisplayName}}` - Example: `John Doe`  
-* `{{.UserHandleName}}` - Example: `@john_doe`  
+- `{{.UserDisplayName}}` → Displays the user's full name (e.g., `John Doe`).  
+- `{{.UserHandleName}}` → Displays the user's handle (e.g., `@john_doe`).  
 
 When previewing a message, all template placeholders will be replaced with the current user's details.  
 

@@ -16,7 +16,7 @@ func TestGetPersonalChanelWelcome(t *testing.T) {
 		CommandMessenger        *usecase.MockCommandMessenger
 		ChannelWelcomeRepo      *usecase.MockChannelWelcomeRepo
 		WelcomeMessagePresenter *usecase.MockWelcomeMessagePresenter
-		Subject                 *GetPersonalChanelWelcome
+		Subject                 *GetPersonalChanelWelcomeMessage
 	}
 
 	setup := func() *Setup {
@@ -26,7 +26,7 @@ func TestGetPersonalChanelWelcome(t *testing.T) {
 
 		commandMessenger.On("PostCommandResponse", mock.Anything).Return()
 
-		subject := &GetPersonalChanelWelcome{
+		subject := &GetPersonalChanelWelcomeMessage{
 			CommandMessenger:        commandMessenger,
 			ChannelWelcomeRepo:      channelWelcomeRepo,
 			WelcomeMessagePresenter: welcomeMessagePresenter,

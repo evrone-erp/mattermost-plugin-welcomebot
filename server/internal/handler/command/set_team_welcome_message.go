@@ -12,6 +12,8 @@ import (
 
 type SetTeamWelcomeMessage struct{}
 
+const setTeamWelcomeMessageHelp = "Set the welcome message displayed after joining the **current team**"
+
 func (c *SetTeamWelcomeMessage) Trigger() string {
 	return "set_team_welcome_message"
 }
@@ -21,7 +23,7 @@ func (c *SetTeamWelcomeMessage) IsPermitted(p usecase.Policy, args *model.Comman
 }
 
 func (c *SetTeamWelcomeMessage) Help() string {
-	return "`/welcomebot set_team_welcome_message [team_name] [message]` - Get welcome message after joining the team"
+	return "`/welcomebot set_team_welcome_message [message]` - " + setTeamWelcomeMessageHelp
 }
 
 func (c *SetTeamWelcomeMessage) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
@@ -53,7 +55,7 @@ func (c *SetTeamWelcomeMessage) Validate(parameters []string) error {
 }
 
 func (c *SetTeamWelcomeMessage) AutocompleteData() *model.AutocompleteData {
-	data := model.NewAutocompleteData("set_team_welcome_message", "[message]", "set team welcome message")
+	data := model.NewAutocompleteData("set_team_welcome_message", "[message]", setTeamWelcomeMessageHelp)
 	data.AddTextArgument("Message", "[message]", "")
 
 	return data

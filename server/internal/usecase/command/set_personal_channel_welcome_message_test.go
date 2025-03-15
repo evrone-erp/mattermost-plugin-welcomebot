@@ -15,7 +15,7 @@ func TestSetPersonalChanelWelcome(t *testing.T) {
 		CommandMessenger   *usecase.MockCommandMessenger
 		ChannelWelcomeRepo *usecase.MockChannelWelcomeRepo
 		ChannelRepo        *usecase.MockChannelRepo
-		Subject            *SetPersonalChanelWelcome
+		Subject            *SetPersonalChanelWelcomeMessage
 	}
 
 	setup := func() *Setup {
@@ -25,7 +25,7 @@ func TestSetPersonalChanelWelcome(t *testing.T) {
 
 		messenger.On("PostCommandResponse", mock.Anything).Return()
 
-		subject := &SetPersonalChanelWelcome{
+		subject := &SetPersonalChanelWelcomeMessage{
 			CommandMessenger:   messenger,
 			ChannelWelcomeRepo: channelWelcomeRepo,
 			ChannelRepo:        channelRepo,
@@ -44,7 +44,7 @@ func TestSetPersonalChanelWelcome(t *testing.T) {
 		Type: model.ChannelTypeOpen,
 	}
 
-	validCommand := "set_personal_channel_welcome foo bar keke   "
+	validCommand := "set_personal_channel_welcome_message foo bar keke   "
 
 	t.Run("happy path", func(t *testing.T) {
 		s := setup()
@@ -79,7 +79,7 @@ func TestSetPersonalChanelWelcome(t *testing.T) {
 		s.ChannelWelcomeRepo.On("SetPersonalChanelWelcome", mock.Anything, mock.Anything).Return(nil)
 		s.ChannelRepo.On("Get", channelID).Return(validChannel, nil)
 
-		s.Subject.Call("set_personal_channel_welcome     ", channelID)
+		s.Subject.Call("set_personal_channel_welcome_message     ", channelID)
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "unable to store empty message")
 		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)

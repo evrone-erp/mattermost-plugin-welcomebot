@@ -16,7 +16,7 @@ func TestGetPublishedChanelWelcome(t *testing.T) {
 		CommandMessenger        *usecase.MockCommandMessenger
 		ChannelWelcomeRepo      *usecase.MockChannelWelcomeRepo
 		WelcomeMessagePresenter *usecase.MockWelcomeMessagePresenter
-		Subject                 *GetPublishedChanelWelcome
+		Subject                 *GetPublishedChanelWelcomeMessage
 	}
 
 	setup := func() *Setup {
@@ -26,7 +26,7 @@ func TestGetPublishedChanelWelcome(t *testing.T) {
 
 		commandMessenger.On("PostCommandResponse", mock.Anything).Return()
 
-		subject := &GetPublishedChanelWelcome{
+		subject := &GetPublishedChanelWelcomeMessage{
 			CommandMessenger:        commandMessenger,
 			ChannelWelcomeRepo:      channelWelcomeRepo,
 			WelcomeMessagePresenter: welcomeMessagePresenter,
