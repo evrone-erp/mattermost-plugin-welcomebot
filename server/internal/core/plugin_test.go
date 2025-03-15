@@ -195,9 +195,9 @@ func TestExecuteCommand(t *testing.T) {
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was updated")
 	})
 
-	t.Run("happy remove_team_welcome", func(t *testing.T) {
+	t.Run("happy remove_team_welcome_message", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot remove_team_welcome")
+		s.ExecuteCommand("/welcomebot remove_team_welcome_message")
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was removed")
 	})
