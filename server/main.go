@@ -12,16 +12,16 @@ func main() {
 	container := Container{plugin: &corePlugin}
 	corePlugin.RegisterDependencyContainer(&container)
 
-	corePlugin.RegisterCommand(&command.GetPersonalChanelWelcome{})
-	corePlugin.RegisterCommand(&command.SetPersonalChanelWelcome{})
-	corePlugin.RegisterCommand(&command.DeletePersonalChanelWelcome{})
-	corePlugin.RegisterCommand(&command.GetPublishedChanelWelcome{})
-	corePlugin.RegisterCommand(&command.SetPublishedChanelWelcome{})
-	corePlugin.RegisterCommand(&command.DeletePublishedChanelWelcome{})
+	corePlugin.RegisterCommand(&command.GetPersonalChanelWelcomeMessage{})
+	corePlugin.RegisterCommand(&command.SetPersonalChanelWelcomeMessage{})
+	corePlugin.RegisterCommand(&command.DeletePersonalChanelWelcomeMessage{})
+	corePlugin.RegisterCommand(&command.GetPublishedChanelWelcomeMessage{})
+	corePlugin.RegisterCommand(&command.SetPublishedChanelWelcomeMessage{})
+	corePlugin.RegisterCommand(&command.DeletePublishedChanelWelcomeMessage{})
 
-	corePlugin.RegisterCommand(&command.GetTeamWelcome{})
+	corePlugin.RegisterCommand(&command.GetTeamWelcomeSettings{})
 	corePlugin.RegisterCommand(&command.SetTeamWelcomeMessage{})
-	corePlugin.RegisterCommand(&command.RemoveTeamWelcomeMessage{})
+	corePlugin.RegisterCommand(&command.DeleteTeamWelcomeMessage{})
 
 	corePlugin.RegisterCommand(&command.ListChannelWelcomes{})
 	corePlugin.RegisterCommand(&command.AddTeamDefaultChannels{})

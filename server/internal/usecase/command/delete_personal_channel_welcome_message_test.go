@@ -15,7 +15,7 @@ func TestDeletePersonalChanelWelcome(t *testing.T) {
 	type Setup struct {
 		CommandMessenger   *usecase.MockCommandMessenger
 		ChannelWelcomeRepo *usecase.MockChannelWelcomeRepo
-		Subject            *DeletePersonalChanelWelcome
+		Subject            *DeletePersonalChanelWelcomeMessage
 	}
 
 	setup := func() *Setup {
@@ -24,7 +24,7 @@ func TestDeletePersonalChanelWelcome(t *testing.T) {
 
 		commandMessenger.On("PostCommandResponse", mock.Anything).Return()
 
-		subject := &DeletePersonalChanelWelcome{
+		subject := &DeletePersonalChanelWelcomeMessage{
 			CommandMessenger:   commandMessenger,
 			ChannelWelcomeRepo: channelWelcomeRepo,
 		}

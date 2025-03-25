@@ -11,6 +11,8 @@ import (
 
 type ListChannelWelcomes struct{}
 
+const listChannelWelcomesHelp = "List all channels with configured welcome messages"
+
 func (c *ListChannelWelcomes) Trigger() string {
 	return "list_channel_welcomes"
 }
@@ -20,7 +22,7 @@ func (c *ListChannelWelcomes) IsPermitted(p usecase.Policy, args *model.CommandA
 }
 
 func (c *ListChannelWelcomes) Help() string {
-	return "`/welcomebot list_channel_welcomes` - print all channels with configured welcome messages"
+	return "`/welcomebot list_channel_welcomes` - " + listChannelWelcomesHelp
 }
 
 func (c *ListChannelWelcomes) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
@@ -42,5 +44,5 @@ func (c *ListChannelWelcomes) Validate(parameters []string) error {
 }
 
 func (c *ListChannelWelcomes) AutocompleteData() *model.AutocompleteData {
-	return model.NewAutocompleteData("list_channel_welcomes", "", "print all channels with configured welcome messages")
+	return model.NewAutocompleteData("list_channel_welcomes", "", listChannelWelcomesHelp)
 }

@@ -7,8 +7,8 @@ import (
 )
 
 func TestGetTeamWelcomeValidate(t *testing.T) {
-	setup := func() *GetTeamWelcome {
-		return &GetTeamWelcome{}
+	setup := func() *GetTeamWelcomeSettings {
+		return &GetTeamWelcomeSettings{}
 	}
 
 	t.Run("happy path", func(t *testing.T) {

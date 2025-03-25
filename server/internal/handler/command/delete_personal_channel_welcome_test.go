@@ -7,8 +7,8 @@ import (
 )
 
 func TestDeletePersonalChanelWelcomeValidate(t *testing.T) {
-	setup := func() *DeletePersonalChanelWelcome {
-		return &DeletePersonalChanelWelcome{}
+	setup := func() *DeletePersonalChanelWelcomeMessage {
+		return &DeletePersonalChanelWelcomeMessage{}
 	}
 
 	t.Run("happy path", func(t *testing.T) {

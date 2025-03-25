@@ -7,14 +7,14 @@ import (
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 )
 
-type GetTeamWelcome struct {
+type GetTeamWelcomeSettings struct {
 	CommandMessenger        usecase.CommandMessenger
 	TeamWelcomeRepo         usecase.TeamWelcomeRepo
 	ChannelRepo             usecase.ChannelRepo
 	WelcomeMessagePresenter usecase.WelcomeMessagePresenter
 }
 
-func (uc *GetTeamWelcome) Call(userID string, teamID string) {
+func (uc *GetTeamWelcomeSettings) Call(userID string, teamID string) {
 	currentWelcome, appErr := uc.TeamWelcomeRepo.GetTeamWelcome(teamID)
 
 	if appErr != nil {

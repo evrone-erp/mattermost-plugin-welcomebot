@@ -8,13 +8,13 @@ import (
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase/utils"
 )
 
-type SetPublishedChanelWelcome struct {
+type SetPersonalChanelWelcomeMessage struct {
 	CommandMessenger   usecase.CommandMessenger
 	ChannelWelcomeRepo usecase.ChannelWelcomeRepo
 	ChannelRepo        usecase.ChannelRepo
 }
 
-func (uc *SetPublishedChanelWelcome) Call(fullCommand string, channelID string) {
+func (uc *SetPersonalChanelWelcomeMessage) Call(fullCommand string, channelID string) {
 	channel, appErr := uc.ChannelRepo.Get(channelID)
 	if appErr != nil {
 		response := fmt.Sprintf("error occurred while checking the type of the chanelId `%s`: `%s`", channelID, appErr)
@@ -27,7 +27,7 @@ func (uc *SetPublishedChanelWelcome) Call(fullCommand string, channelID string) 
 		return
 	}
 
-	parsedCommand := strings.SplitN(fullCommand, "set_published_channel_welcome", 2)
+	parsedCommand := strings.SplitN(fullCommand, "set_personal_channel_welcome_message", 2)
 
 	if len(parsedCommand) != 2 {
 		response := fmt.Sprintf("error ocured while parsing command %s", fullCommand)
@@ -44,7 +44,7 @@ func (uc *SetPublishedChanelWelcome) Call(fullCommand string, channelID string) 
 		return
 	}
 
-	if appErr := uc.ChannelWelcomeRepo.SetPublishedChanelWelcome(channel.Id, message); appErr != nil {
+	if appErr := uc.ChannelWelcomeRepo.SetPersonalChanelWelcome(channel.Id, message); appErr != nil {
 		response := fmt.Sprintf("error occurred while storing the welcome message for the chanel: `%s`", appErr)
 		uc.CommandMessenger.PostCommandResponse(response)
 		return

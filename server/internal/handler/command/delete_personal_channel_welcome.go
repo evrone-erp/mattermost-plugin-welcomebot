@@ -9,22 +9,24 @@ import (
 	"github.com/mattermost/mattermost/server/public/model"
 )
 
-type DeletePersonalChanelWelcome struct{}
+type DeletePersonalChanelWelcomeMessage struct{}
 
-func (c *DeletePersonalChanelWelcome) Trigger() string {
-	return "delete_personal_channel_welcome"
+const deletePersonalChanelWelcomeMessageHelp = "Delete the personal welcome message for the **current channel** (if any)"
+
+func (c *DeletePersonalChanelWelcomeMessage) Trigger() string {
+	return "delete_personal_channel_welcome_message"
 }
 
-func (c *DeletePersonalChanelWelcome) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
+func (c *DeletePersonalChanelWelcomeMessage) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
 	return p.IsSysadmin(args.UserId) || p.CanManageChannel(args.UserId, args.ChannelId)
 }
 
-func (c *DeletePersonalChanelWelcome) Help() string {
-	return "`/welcomebot delete_personal_channel_welcome` - delete the personal welcome message for the given channel (if any)"
+func (c *DeletePersonalChanelWelcomeMessage) Help() string {
+	return "`/welcomebot delete_personal_channel_welcome_message` - " + deletePersonalChanelWelcomeMessageHelp
 }
 
-func (c *DeletePersonalChanelWelcome) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
-	cmd := command.DeletePersonalChanelWelcome{
+func (c *DeletePersonalChanelWelcomeMessage) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
+	cmd := command.DeletePersonalChanelWelcomeMessage{
 		CommandMessenger:   p.Container().NewCommandMessenger(args),
 		ChannelWelcomeRepo: p.Container().ChannelWelcomeRepo(),
 	}
@@ -32,14 +34,14 @@ func (c *DeletePersonalChanelWelcome) Execute(p handler.BotAPIProvider, args *mo
 	cmd.Call(args.ChannelId)
 }
 
-func (c *DeletePersonalChanelWelcome) Validate(parameters []string) error {
+func (c *DeletePersonalChanelWelcomeMessage) Validate(parameters []string) error {
 	if len(parameters) > 0 {
-		return errors.New("`delete_personal_channel_welcome` command does not accept any extra parameters")
+		return errors.New("`delete_personal_channel_welcome_message` command does not accept any extra parameters")
 	}
 
 	return nil
 }
 
-func (c *DeletePersonalChanelWelcome) AutocompleteData() *model.AutocompleteData {
-	return model.NewAutocompleteData("delete_personal_channel_welcome", "", "Delete the welcome message for the channel")
+func (c *DeletePersonalChanelWelcomeMessage) AutocompleteData() *model.AutocompleteData {
+	return model.NewAutocompleteData("delete_personal_channel_welcome_message", "", deletePersonalChanelWelcomeMessageHelp)
 }
