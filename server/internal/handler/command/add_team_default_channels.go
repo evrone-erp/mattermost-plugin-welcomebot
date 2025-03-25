@@ -13,6 +13,8 @@ import (
 
 type AddTeamDefaultChannels struct{}
 
+const addTeamDefaultChannelsHelp = "Add channels to automatically join when entering the **current team**"
+
 type AddTeamDefaultChannelsInput struct {
 	channelNames []string
 }
@@ -22,7 +24,7 @@ func (c *AddTeamDefaultChannels) Trigger() string {
 }
 
 func (c *AddTeamDefaultChannels) Help() string {
-	return "`/welcomebot add_team_default_channels <[~channel], >` add channels to automatically join after entering the team"
+	return "`/welcomebot add_team_default_channels <[~channel]>` - " + addTeamDefaultChannelsHelp
 }
 
 func (c *AddTeamDefaultChannels) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
@@ -57,7 +59,7 @@ func (c *AddTeamDefaultChannels) Validate(parameters []string) error {
 }
 
 func (c *AddTeamDefaultChannels) AutocompleteData() *model.AutocompleteData {
-	data := model.NewAutocompleteData("add_team_default_channels", "[~channel_name]", "add channels for automatic join")
+	data := model.NewAutocompleteData("add_team_default_channels", "[~channel_name]", addTeamDefaultChannelsHelp)
 	data.AddTextArgument("Message", "[~space_separated_channels]", "")
 
 	return data

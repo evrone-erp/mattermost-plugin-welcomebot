@@ -15,7 +15,7 @@ func TestSetPublishedChanelWelcome(t *testing.T) {
 		CommandMessenger   *usecase.MockCommandMessenger
 		ChannelWelcomeRepo *usecase.MockChannelWelcomeRepo
 		ChannelRepo        *usecase.MockChannelRepo
-		Subject            *SetPublishedChanelWelcome
+		Subject            *SetPublishedChanelWelcomeMessage
 	}
 
 	setup := func() *Setup {
@@ -25,7 +25,7 @@ func TestSetPublishedChanelWelcome(t *testing.T) {
 
 		messenger.On("PostCommandResponse", mock.Anything).Return()
 
-		subject := &SetPublishedChanelWelcome{
+		subject := &SetPublishedChanelWelcomeMessage{
 			CommandMessenger:   messenger,
 			ChannelWelcomeRepo: channelWelcomeRepo,
 			ChannelRepo:        channelRepo,
@@ -44,7 +44,7 @@ func TestSetPublishedChanelWelcome(t *testing.T) {
 		Type: model.ChannelTypeOpen,
 	}
 
-	validCommand := "set_published_channel_welcome foo bar keke   "
+	validCommand := "set_published_channel_welcome_message foo bar keke   "
 
 	t.Run("happy path", func(t *testing.T) {
 		s := setup()
@@ -79,26 +79,26 @@ func TestSetPublishedChanelWelcome(t *testing.T) {
 		s.ChannelWelcomeRepo.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
 		s.ChannelRepo.On("Get", channelID).Return(validChannel, nil)
 
-		s.Subject.Call("set_published_channel_welcome     ", channelID)
+		s.Subject.Call("set_published_channel_welcome_message     ", channelID)
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "unable to store empty message")
 		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
 		s.ChannelWelcomeRepo.AssertNumberOfCalls(t, "SetPersonalChanelWelcome", 0)
 	})
 
-	t.Run("private channel", func(t *testing.T) {
+	t.Run("direct channel", func(t *testing.T) {
 		s := setup()
 
 		s.ChannelWelcomeRepo.On("SetPublishedChanelWelcome", mock.Anything, mock.Anything).Return(nil)
-		privateChannel := &model.Channel{
+		channel := &model.Channel{
 			Id:   channelID,
-			Type: model.ChannelTypePrivate,
+			Type: model.ChannelTypeDirect,
 		}
-		s.ChannelRepo.On("Get", channelID).Return(privateChannel, nil)
+		s.ChannelRepo.On("Get", channelID).Return(channel, nil)
 
 		s.Subject.Call(validCommand, channelID)
 
-		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "welcome messages are not supported for direct channels")
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Channel type is not supported")
 		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
 		s.ChannelWelcomeRepo.AssertNumberOfCalls(t, "SetPublishedChanelWelcome", 0)
 	})

@@ -145,23 +145,10 @@ func (p *Plugin) GetCommand() *model.Command {
 		DisplayName:      "welcomebot",
 		Description:      "Welcome Bot helps add new team members to channels.",
 		AutoComplete:     true,
-		AutoCompleteDesc: p.AutoCompleteDesc(),
+		AutoCompleteDesc: "<command> [args...]",
 		AutoCompleteHint: "[command]",
 		AutocompleteData: p.GetAutocompleteData(),
 	}
-}
-
-func (p *Plugin) AutoCompleteDesc() string {
-	triggers := make([]string, len(p.commands)+1)
-
-	for key := range p.commands {
-		triggers = append(triggers, key)
-	}
-
-	triggers = append(triggers, commandTriggerHelp)
-	result := fmt.Sprintf("Available commands: %s", strings.Join(triggers, ", "))
-
-	return result
 }
 
 func (p *Plugin) ExecuteCommand(_ *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
@@ -223,14 +210,7 @@ func (p *Plugin) printHelp(args *model.CommandArgs) {
 }
 
 func (p *Plugin) GetAutocompleteData() *model.AutocompleteData {
-	triggers := make([]string, len(p.commands))
-
-	for key := range p.commands {
-		triggers = append(triggers, key)
-	}
-
-	description := fmt.Sprintf("Available commands: %s", strings.Join(triggers, ", "))
-	welcomebot := model.NewAutocompleteData("welcomebot", "[command]", description)
+	welcomebot := model.NewAutocompleteData("welcomebot", "[command]", "[args...]")
 
 	for _, command := range p.commands {
 		welcomebot.AddCommand(command.AutocompleteData())

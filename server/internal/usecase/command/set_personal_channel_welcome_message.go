@@ -5,16 +5,16 @@ import (
 	"strings"
 
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
-	"github.com/mattermost/mattermost/server/public/model"
+	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase/utils"
 )
 
-type SetPersonalChanelWelcome struct {
+type SetPersonalChanelWelcomeMessage struct {
 	CommandMessenger   usecase.CommandMessenger
 	ChannelWelcomeRepo usecase.ChannelWelcomeRepo
 	ChannelRepo        usecase.ChannelRepo
 }
 
-func (uc *SetPersonalChanelWelcome) Call(fullCommand string, channelID string) {
+func (uc *SetPersonalChanelWelcomeMessage) Call(fullCommand string, channelID string) {
 	channel, appErr := uc.ChannelRepo.Get(channelID)
 	if appErr != nil {
 		response := fmt.Sprintf("error occurred while checking the type of the chanelId `%s`: `%s`", channelID, appErr)
@@ -22,12 +22,12 @@ func (uc *SetPersonalChanelWelcome) Call(fullCommand string, channelID string) {
 		return
 	}
 
-	if channel.Type == model.ChannelTypePrivate {
-		uc.CommandMessenger.PostCommandResponse("welcome messages are not supported for direct channels")
+	if !utils.IsChannelWithWelcomeSupport(channel) {
+		uc.CommandMessenger.PostCommandResponse("Channel type is not supported")
 		return
 	}
 
-	parsedCommand := strings.SplitN(fullCommand, "set_personal_channel_welcome", 2)
+	parsedCommand := strings.SplitN(fullCommand, "set_personal_channel_welcome_message", 2)
 
 	if len(parsedCommand) != 2 {
 		response := fmt.Sprintf("error ocured while parsing command %s", fullCommand)

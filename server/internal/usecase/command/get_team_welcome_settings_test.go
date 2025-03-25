@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetTeamWelcome(t *testing.T) {
+func TestGetTeamWelcomeSettings(t *testing.T) {
 	type Setup struct {
 		CommandMessenger        *usecase.MockCommandMessenger
 		TeamWelcomeRepo         *usecase.MockTeamWelcomeRepo
 		ChannelRepo             *usecase.MockChannelRepo
 		WelcomeMessagePresenter *usecase.MockWelcomeMessagePresenter
-		Subject                 *GetTeamWelcome
+		Subject                 *GetTeamWelcomeSettings
 	}
 
 	setup := func() *Setup {
@@ -26,7 +26,7 @@ func TestGetTeamWelcome(t *testing.T) {
 
 		commandMessenger.On("PostCommandResponse", mock.Anything).Return()
 
-		subject := &GetTeamWelcome{
+		subject := &GetTeamWelcomeSettings{
 			CommandMessenger:        commandMessenger,
 			TeamWelcomeRepo:         teamWelcomeRepo,
 			ChannelRepo:             channelRepo,

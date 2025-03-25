@@ -7,12 +7,12 @@ import (
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 )
 
-type RemoveTeamWelcomeMessage struct {
+type DeleteTeamWelcomeMessage struct {
 	CommandMessenger usecase.CommandMessenger
 	TeamWelcomeRepo  usecase.TeamWelcomeRepo
 }
 
-func (uc *RemoveTeamWelcomeMessage) Call(teamID string) {
+func (uc *DeleteTeamWelcomeMessage) Call(teamID string) {
 	currentWelcome, appErr := uc.TeamWelcomeRepo.GetTeamWelcome(teamID)
 
 	if appErr != nil {
@@ -33,5 +33,5 @@ func (uc *RemoveTeamWelcomeMessage) Call(teamID string) {
 		return
 	}
 
-	uc.CommandMessenger.PostCommandResponse("Welcome message was removed")
+	uc.CommandMessenger.PostCommandResponse("Welcome message was deleted")
 }

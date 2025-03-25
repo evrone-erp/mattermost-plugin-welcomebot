@@ -9,11 +9,11 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestRemoveTeamWelcomeMessage(t *testing.T) {
+func TestDeleteTeamWelcomeMessage(t *testing.T) {
 	type Setup struct {
 		CommandMessenger *usecase.MockCommandMessenger
 		TeamWelcomeRepo  *usecase.MockTeamWelcomeRepo
-		Subject          *RemoveTeamWelcomeMessage
+		Subject          *DeleteTeamWelcomeMessage
 	}
 
 	setup := func() *Setup {
@@ -22,7 +22,7 @@ func TestRemoveTeamWelcomeMessage(t *testing.T) {
 
 		commandMessenger.On("PostCommandResponse", mock.Anything).Return()
 
-		subject := &RemoveTeamWelcomeMessage{
+		subject := &DeleteTeamWelcomeMessage{
 			CommandMessenger: commandMessenger,
 			TeamWelcomeRepo:  teamWelcomeRepo,
 		}
@@ -47,7 +47,7 @@ func TestRemoveTeamWelcomeMessage(t *testing.T) {
 		s.Subject.Call("team-id")
 
 		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
-		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was removed")
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was deleted")
 	})
 
 	t.Run("with previouis welcome", func(t *testing.T) {
@@ -67,7 +67,7 @@ func TestRemoveTeamWelcomeMessage(t *testing.T) {
 		s.Subject.Call("team-id")
 
 		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 1)
-		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was removed")
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was deleted")
 	})
 
 	t.Run("happy path with bad previous welcome messsage", func(t *testing.T) {
@@ -84,7 +84,7 @@ func TestRemoveTeamWelcomeMessage(t *testing.T) {
 
 		s.CommandMessenger.AssertNumberOfCalls(t, "PostCommandResponse", 2)
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Error while fetching current welcome team-id: broken, trying to rewrite...")
-		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was removed")
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was deleted")
 	})
 
 	t.Run("with a saving error", func(t *testing.T) {

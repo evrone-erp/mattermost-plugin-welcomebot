@@ -13,6 +13,8 @@ import (
 
 type RemoveTeamDefaultChannels struct{}
 
+const removeTeamDefaultChannelsHelp = "Remove channels from the auto-join list when entering the **current team**"
+
 type RemoveTeamDefaultChannelsInput struct {
 	channelNames []string
 }
@@ -26,7 +28,7 @@ func (c *RemoveTeamDefaultChannels) IsPermitted(p usecase.Policy, args *model.Co
 }
 
 func (c *RemoveTeamDefaultChannels) Help() string {
-	return "`/welcomebot remove_team_default_channels <[~channel], >` remove channels to automatically join after entering the team"
+	return "`/welcomebot remove_team_default_channels <[~channel]>` - " + removeTeamDefaultChannelsHelp
 }
 
 func (c *RemoveTeamDefaultChannels) Execute(p handler.BotAPIProvider, args *model.CommandArgs) {
@@ -57,7 +59,7 @@ func (c *RemoveTeamDefaultChannels) Validate(parameters []string) error {
 }
 
 func (c *RemoveTeamDefaultChannels) AutocompleteData() *model.AutocompleteData {
-	data := model.NewAutocompleteData("remove_team_default_channels", "", "removes channels for automatic join")
+	data := model.NewAutocompleteData("remove_team_default_channels", "", removeTeamDefaultChannelsHelp)
 	data.AddTextArgument("Message", "[~space_separated_channels]", "")
 
 	return data

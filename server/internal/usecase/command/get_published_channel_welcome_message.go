@@ -6,14 +6,14 @@ import (
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/usecase"
 )
 
-type GetPersonalChanelWelcome struct {
+type GetPublishedChanelWelcomeMessage struct {
 	CommandMessenger        usecase.CommandMessenger
 	ChannelWelcomeRepo      usecase.ChannelWelcomeRepo
 	WelcomeMessagePresenter usecase.WelcomeMessagePresenter
 }
 
-func (uc *GetPersonalChanelWelcome) Call(currentUserID string, channelID string) {
-	welcome, appErr := uc.ChannelWelcomeRepo.GetPersonalChanelWelcome(channelID)
+func (uc *GetPublishedChanelWelcomeMessage) Call(currentUserID string, channelID string) {
+	welcome, appErr := uc.ChannelWelcomeRepo.GetPublishedChanelWelcome(channelID)
 
 	if appErr != nil {
 		message := fmt.Sprintf("error occurred while retrieving the welcome message for the chanel: `%s`", appErr)

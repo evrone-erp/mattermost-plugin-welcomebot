@@ -104,16 +104,16 @@ func TestExecuteCommand(t *testing.T) {
 
 		p := NewPlugin(&model.Manifest{})
 		p.RegisterDependencyContainer(container)
-		p.RegisterCommand(&command.GetPersonalChanelWelcome{})
-		p.RegisterCommand(&command.GetPublishedChanelWelcome{})
-		p.RegisterCommand(&command.SetPublishedChanelWelcome{})
-		p.RegisterCommand(&command.SetPersonalChanelWelcome{})
-		p.RegisterCommand(&command.DeletePublishedChanelWelcome{})
-		p.RegisterCommand(&command.DeletePersonalChanelWelcome{})
+		p.RegisterCommand(&command.GetPersonalChanelWelcomeMessage{})
+		p.RegisterCommand(&command.GetPublishedChanelWelcomeMessage{})
+		p.RegisterCommand(&command.SetPublishedChanelWelcomeMessage{})
+		p.RegisterCommand(&command.SetPersonalChanelWelcomeMessage{})
+		p.RegisterCommand(&command.DeletePublishedChanelWelcomeMessage{})
+		p.RegisterCommand(&command.DeletePersonalChanelWelcomeMessage{})
 		p.RegisterCommand(&command.ListChannelWelcomes{})
 		p.RegisterCommand(&command.SetTeamWelcomeMessage{})
-		p.RegisterCommand(&command.GetTeamWelcome{})
-		p.RegisterCommand(&command.RemoveTeamWelcomeMessage{})
+		p.RegisterCommand(&command.GetTeamWelcomeSettings{})
+		p.RegisterCommand(&command.DeleteTeamWelcomeMessage{})
 		p.RegisterCommand(&command.AddTeamDefaultChannels{})
 		p.RegisterCommand(&command.RemoveTeamDefaultChannels{})
 
@@ -139,44 +139,44 @@ func TestExecuteCommand(t *testing.T) {
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Unknown action dunno")
 	})
 
-	t.Run("happy get_personal_channel_welcome", func(t *testing.T) {
+	t.Run("happy get_personal_channel_welcome_message", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot get_personal_channel_welcome")
+		s.ExecuteCommand("/welcomebot get_personal_channel_welcome_message")
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message is:\nPersonal Hello for @johny!")
 	})
 
 	t.Run("happy get_publilshed_channel_welcome", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot get_published_channel_welcome")
+		s.ExecuteCommand("/welcomebot get_published_channel_welcome_message")
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message is:\nPublished Hello for @johny!")
 	})
 
 	t.Run("happy set_publilshed_channel_welcome", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot set_published_channel_welcome new pub")
+		s.ExecuteCommand("/welcomebot set_published_channel_welcome_message new pub")
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "stored the welcome message:\nnew pub")
 	})
 
-	t.Run("happy set_personal_channel_welcome", func(t *testing.T) {
+	t.Run("happy set_personal_channel_welcome_message", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot set_personal_channel_welcome new per")
+		s.ExecuteCommand("/welcomebot set_personal_channel_welcome_message new per")
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "stored the welcome message:\nnew per")
 	})
 
-	t.Run("happy delete_publilshed_channel_welcome", func(t *testing.T) {
+	t.Run("happy delete_publilshed_channel_welcome_message", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot delete_published_channel_welcome")
+		s.ExecuteCommand("/welcomebot delete_published_channel_welcome_message")
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "welcome message has been deleted")
 	})
 
-	t.Run("happy delete_personal_channel_welcome", func(t *testing.T) {
+	t.Run("happy delete_personal_channel_welcome_message", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot delete_personal_channel_welcome")
+		s.ExecuteCommand("/welcomebot delete_personal_channel_welcome_message")
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "welcome message has been deleted")
 	})
@@ -195,16 +195,16 @@ func TestExecuteCommand(t *testing.T) {
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was updated")
 	})
 
-	t.Run("happy remove_team_welcome", func(t *testing.T) {
+	t.Run("happy delete_team_welcome_message", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot remove_team_welcome")
+		s.ExecuteCommand("/welcomebot delete_team_welcome_message")
 
-		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was removed")
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Welcome message was deleted")
 	})
 
-	t.Run("happy get_team_welcome", func(t *testing.T) {
+	t.Run("happy get_team_welcome_settings", func(t *testing.T) {
 		s := setup()
-		s.ExecuteCommand("/welcomebot get_team_welcome")
+		s.ExecuteCommand("/welcomebot get_team_welcome_settings")
 
 		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", "Current welcome is:\nTeam welcome for @johny!\n\n\nNo default channels\n")
 	})

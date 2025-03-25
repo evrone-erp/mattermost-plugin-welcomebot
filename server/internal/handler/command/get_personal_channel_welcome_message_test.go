@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetPublishedChanelWelcomeValidate(t *testing.T) {
-	setup := func() *GetPublishedChanelWelcome {
-		return &GetPublishedChanelWelcome{}
+func TestGetPersonalChanelWelcomeValidate(t *testing.T) {
+	setup := func() *GetPersonalChanelWelcomeMessage {
+		return &GetPersonalChanelWelcomeMessage{}
 	}
 
 	t.Run("happy path", func(t *testing.T) {
