@@ -1,6 +1,7 @@
 package core
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/evrone-erp/mattermost-plugin-welcomebot/server/internal/handler"
@@ -131,6 +132,16 @@ func TestExecuteCommand(t *testing.T) {
 			ExecuteCommand:     executeCommand,
 		}
 	}
+
+	t.Run("help message", func(t *testing.T) {
+		s := setup()
+		s.ExecuteCommand("/welcomebot")
+
+		s.CommandMessenger.AssertCalled(t, "PostCommandResponse", mock.MatchedBy(func(arg string) bool {
+			return regexp.MustCompile(`welcomebot add_team_default_channels`).MatchString(arg) &&
+				regexp.MustCompile(`Welcome messages support a simple templating`).MatchString(arg)
+		}))
+	})
 
 	t.Run("invalid command", func(t *testing.T) {
 		s := setup()

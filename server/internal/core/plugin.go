@@ -206,7 +206,11 @@ func (p *Plugin) printHelp(args *model.CommandArgs) {
 	sort.Strings(commandsHelp)
 
 	text := "###### Mattermost welcomebot Plugin - Slash Command Help\n" + strings.Join(commandsHelp, "\n")
-	p.Container().NewCommandMessenger(args).PostCommandResponse(text)
+	suffix := "###### Welcome messages support a simple templating system for user-specific placeholders:\n" +
+		"{{.UserDisplayName}} → Displays the user's full name (e.g., John Doe)\n" +
+		"{{.UserHandleName}} → Displays the user's handle (e.g., @john_doe)\n"
+
+	p.Container().NewCommandMessenger(args).PostCommandResponse(text + "\n" + suffix)
 }
 
 func (p *Plugin) GetAutocompleteData() *model.AutocompleteData {
