@@ -79,3 +79,5 @@ The version of a plugin is determined at compile time, automatically populating 
 * If there is no version tag, an empty version will be combined with the short hash, e.g. `0.0.0+76081421`.
 
 To disable this behaviour, manually populate and maintain the `version` field.
+
+[<img src="https://evrone.com/logo/evrone-sponsored-logo.png" width=231>](https://evrone.com/?utm_source=github&utm_medium=mattermost-plugin-welcomebot)
