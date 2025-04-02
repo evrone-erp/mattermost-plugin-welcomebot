@@ -54,6 +54,7 @@ func TestExecuteCommand(t *testing.T) {
 
 		commandMessenger.On("PostCommandResponse", mock.Anything).Return(commandMessenger)
 		policy.On("IsSysadmin", mock.Anything).Return(true)
+		policy.On("CanManageTeam", mock.Anything, mock.Anything).Return(true)
 
 		channel1 := &model.Channel{
 			Id:   "channel-id",
