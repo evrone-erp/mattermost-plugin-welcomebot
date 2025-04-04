@@ -18,7 +18,7 @@ func (c *DeleteTeamWelcomeMessage) Trigger() string {
 }
 
 func (c *DeleteTeamWelcomeMessage) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
-	return p.IsSysadmin(args.UserId)
+	return p.CanManageTeam(args.UserId, args.TeamId)
 }
 
 func (c *DeleteTeamWelcomeMessage) Help() string {
