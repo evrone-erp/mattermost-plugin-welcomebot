@@ -24,7 +24,7 @@ func (c *RemoveTeamDefaultChannels) Trigger() string {
 }
 
 func (c *RemoveTeamDefaultChannels) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
-	return p.IsSysadmin(args.UserId)
+	return p.CanManageTeam(args.UserId, args.TeamId)
 }
 
 func (c *RemoveTeamDefaultChannels) Help() string {

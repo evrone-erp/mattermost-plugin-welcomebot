@@ -47,7 +47,7 @@ func (c *AddTeamDefaultChannels) Execute(p handler.BotAPIProvider, args *model.C
 }
 
 func (c *AddTeamDefaultChannels) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
-	return p.IsSysadmin(args.UserId)
+	return p.CanManageTeam(args.UserId, args.TeamId)
 }
 
 func (c *AddTeamDefaultChannels) Validate(parameters []string) error {

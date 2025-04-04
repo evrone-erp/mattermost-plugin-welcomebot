@@ -18,7 +18,7 @@ func (c *ListChannelWelcomes) Trigger() string {
 }
 
 func (c *ListChannelWelcomes) IsPermitted(p usecase.Policy, args *model.CommandArgs) bool {
-	return p.IsSysadmin(args.UserId)
+	return p.CanManageTeam(args.UserId, args.TeamId)
 }
 
 func (c *ListChannelWelcomes) Help() string {
